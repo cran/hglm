@@ -1,0 +1,16 @@
+% $Id: hglm.Rnw $
+
+%\VignetteIndexEntry{The hglm Package}
+%\VignetteKeywords{hglm}
+%\VignettePackage{hglm}
+
+\documentclass{article}
+
+\usepackage{pdfpages}
+
+\begin{document}
+
+\includepdf[pages={1-23}, fitpaper=true]{hglmdoc.pdf}
+
+\end{document}
+
