@@ -1,6 +1,6 @@
 `hglm.default` <-
 function(X=NULL,y=NULL,Z=NULL,family=gaussian(link=identity),
-rand.family=gaussian(link=identity), method="HL",conv=1e-4,maxit=20,startval=NULL,
+rand.family=gaussian(link=identity), method="EQL",conv=1e-4,maxit=20,startval=NULL,
 fixed=NULL,random=NULL,X.disp=NULL,disp=NULL,link.disp="log",data=NULL, weights=NULL,
 fix.disp=NULL,offset=NULL,...){
   Call<-match.call()
@@ -72,8 +72,7 @@ fix.disp=NULL,offset=NULL,...){
 #Note this variance function
 		variance <- function(mu) mu
 		validmu <- function(mu) all(mu > 0)
-		dev.resids <- function(y, mu, wt) -2 * wt * (log(ifelse(y ==
-																0, 1, y/mu)) - (y - mu)/mu)
+		dev.resids <- function(y, mu, wt) -2 * wt * (log(mu) + (1 - mu))
 		structure(list(family = "GAMMA", link = linktemp, linkfun = stats$linkfun,
 					   linkinv = stats$linkinv, variance = variance, dev.resids = dev.resids, mu.eta = stats$mu.eta),
 				  class = "family")
@@ -261,7 +260,7 @@ fix.disp=NULL,offset=NULL,...){
   if (!is.null(z)) names(ui)=z.names
   fixef<-b.hat                        
   if (!is.null(z)) {
-    ranef<-ui
+    ranef<-v.i #xia 100511 ui
   } else {
     ranef<-NULL
     phi<-NULL

@@ -7,7 +7,8 @@
  Plots residuals for the mean and dispersion models, individual deviances and hatvalues for \code{hglm} objects
 }
 \usage{
-\method{plot}{hglm}(x, pch = "+", col.theme = "colorful", output = "screen", filename = "HGLMplot", ...)
+\method{plot}{hglm}(x, pch = "+", col.theme = "colorful", output = "screen", 
+filename = "HGLMplot", ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

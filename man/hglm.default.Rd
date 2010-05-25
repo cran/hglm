@@ -9,11 +9,11 @@
     The function can be called either by specifying the design matrices or as a \code{\link{formula}}.
 }
 \usage{
-\method{hglm}{default}(X=NULL,y=NULL,Z=NULL,family=gaussian(link=identity),
-rand.family=gaussian(link=identity), method="HL",
-conv=1e-4,maxit=20,startval=NULL,fixed=NULL,random=NULL,
-X.disp=NULL, disp=NULL, link.disp="log",data=NULL,
-weights=NULL,fix.disp=NULL, offset=NULL,...)
+\method{hglm}{default}(X=NULL, y=NULL, Z=NULL, family=gaussian(link=identity),
+rand.family=gaussian(link=identity), method="EQL",
+conv=1e-4, maxit=20, startval=NULL, fixed=NULL, random=NULL,
+X.disp=NULL, disp=NULL, link.disp="log", data=NULL,
+weights=NULL, fix.disp=NULL, offset=NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -21,8 +21,8 @@ weights=NULL,fix.disp=NULL, offset=NULL,...)
   \item{y}{the dependent variable}
   \item{Z}{an incidence matrix for the random effects}
   \item{family}{a description of the error distribution and link function to be used in the mean part of the model. (See \code{\link{family}} for details of family functions.)}
-  \item{rand.family}{a description of the error distribution and link function to be used in the variance part of the model.}
-  \item{method}{estimation method where \code{HL} is the HL(0,0) method of Lee et al (2006)}
+  \item{rand.family}{a description of the error distribution and link function to be used in the variance part of the model}
+  \item{method}{estimation method where \code{EQL} is the method of interconnected GLMs presented in Lee et al (2006)}
   \item{conv}{a convergence criteria (change in linear predictor between iterations)}
   \item{maxit}{maximum number of iterations in the hglm algorithm}
   \item{startval}{a vector of starting values in the following order: fixed effects, random effect, variance of random effects, variance of residuals}
@@ -33,7 +33,7 @@ weights=NULL,fix.disp=NULL, offset=NULL,...)
   \item{link.disp}{the link function for the dispersion part of the model}
   \item{data}{the data frame to be used together with \code{fixed} and \code{random}}
   \item{weights}{prior weights to be specified in weighted regression }
-  \item{fix.disp}{a numeric value if the dispersion parameter of the mean model is known for example 1 for binomial and Poisson model.}
+  \item{fix.disp}{a numeric value if the dispersion parameter of the mean model is known for example 1 for binomial and Poisson model}
   \item{offset}{an offset term for the mean model}
   \item{\dots}{ not used }
 }

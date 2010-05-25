@@ -79,9 +79,15 @@ filename = "HGLMplot", ...) {
 					plot(deviances, ylab = "Deviances", pch = pch, col = pcol, bty = "n")
 					beta <- var(deviances)/mean(deviances)
 					alpha <- mean(deviances)/beta
-					qqplot(rgamma(9999, alpha, 1/beta), deviances, col = pcol, 
-						   pch = pch, xlab = "Gamma Quantiles", ylab = "Deviance Quantiles", 
-						   bty = "n")
+  					if (length(deviances) < 5001) max.L <- 10000
+  					if (length(deviances) > 5000) max.L <- length(deviances)*10
+  					xx <- rgamma(max.L, alpha, 1/beta) 
+  					steps <- ceiling(max.L/length(deviances))
+  					vec.indx <- steps*(1:length(deviances)) - round(steps/2)
+  					x.alt <- sort(xx)[vec.indx]
+  					sy <- sort(deviances)
+  					plot(x.alt, sy, main="", col = pcol, pch = pch, bty = "n", ylab = "Deviance Quantiles", xlab="Gamma Quantiles")
+					#qqplot(rgamma(9999, alpha, 1/beta), deviances, col = pcol, pch = pch, xlab = "Gamma Quantiles", ylab = "Deviance Quantiles", bty = "n")
 					abline(0, 1, col = lcol)
 					hist(deviances, density = 15, xlab = "Deviances", main = "", col = pcol)
 				}

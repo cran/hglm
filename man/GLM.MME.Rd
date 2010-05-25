@@ -6,7 +6,9 @@
   An internal function to carry out IWLS estimation for hglm.
 }
 \usage{
-GLM.MME(Augy, AugXZ, starting.delta, tau, phi, n.fixed, n.random, off, weights.sqrt, prior.weights, family, rand.family, maxit, conv, tol = 1e-07)
+GLM.MME(Augy, AugXZ, starting.delta, tau, phi, n.fixed, n.random, 
+off, weights.sqrt, prior.weights, family, rand.family, 
+maxit, conv, tol = 1e-07)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
