@@ -82,7 +82,7 @@ filename = "HGLMplot", ...) {
   					if (length(deviances) < 5001) max.L <- 10000
   					if (length(deviances) > 5000) max.L <- length(deviances)*10
   					xx <- rgamma(max.L, alpha, 1/beta) 
-  					steps <- ceiling(max.L/length(deviances))
+  					steps <- floor(max.L/length(deviances))
   					vec.indx <- steps*(1:length(deviances)) - round(steps/2)
   					x.alt <- sort(xx)[vec.indx]
   					sy <- sort(deviances)

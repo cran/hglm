@@ -16,15 +16,15 @@ Hierarchical Generalized Linear Models
 \tabular{ll}{
 Package: \tab hglm\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2009-10-08\cr
+Version: \tab 1.1.1\cr
+Date: \tab 2010-06-08\cr
 License: \tab Unlimited\cr
 LazyLoad: \tab yes\cr
 }
-This is version 1.0 of the hglm package. 
+This is version 1.1.1 of the hglm package. 
 }
 \author{
-M. Alam, L. Ronnegard, X. Shen
+Moudud Alam, Lars Ronnegard, Xia Shen
 Maintainer: Lars Ronnegard <lrn@du.se>
 }
 \references{
