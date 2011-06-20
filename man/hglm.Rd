@@ -9,33 +9,37 @@
     The function can be called either by specifying the design matrices or as a \code{\link{formula}}.
 }
 \usage{
-hglm(X=NULL, y=NULL, Z=NULL, family=gaussian(link=identity),
-rand.family=gaussian(link=identity), method="EQL",
-conv=1e-4, maxit=20, startval=NULL, fixed=NULL, random=NULL,
-X.disp=NULL, disp=NULL, link.disp="log", data=NULL, 
-weights=NULL, fix.disp=NULL, offset=NULL,...)
+hglm(X = NULL, y = NULL, Z = NULL, family = gaussian(link = identity),
+     rand.family = gaussian(link = identity), method = "EQL",
+     conv = 1e-4, maxit = 20, startval = NULL, fixed = NULL, random = NULL,
+     X.disp = NULL, disp = NULL, link.disp = "log", data = NULL, 
+     weights = NULL, fix.disp=NULL, offset = NULL, 
+     RandC = NULL, sparse = TRUE, vcovmat = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{X}{a design matrix for the fixed effects}
-  \item{y}{the dependent variable}
-  \item{Z}{an design matrix for the random effects}
-  \item{family}{a description of the error distribution and link function to be used in the mean part of the model. (See \code{\link{family}} for details of family functions.)}
-  \item{rand.family}{a description of the error distribution and link function to be used in the variance part of the model.}
-  \item{method}{estimation method where \code{EQL} is the method of interconnected GLMs presented in Lee et al (2006)}
-  \item{conv}{a convergence criteria (change in linear predictor between iterations)}
-  \item{maxit}{maximum number of iterations in the hglm algorithm}
-  \item{startval}{a vector of starting values in the following order: fixed effects, random effect, variance of random effects, variance of residuals}
-  \item{fixed}{a \code{\link{formula}} specifying the fixed effects part of the model }
-  \item{random}{a one-sided \code{\link{formula}} specifying the random effects part of the model }
-  \item{X.disp}{a design matrix for the fixed effects in the dispersion part of the model}
-  \item{disp}{a one-sided \code{\link{formula}} specifying the fixed effects in the dispersion part of the model }
-  \item{link.disp}{the link function for the dispersion part of the model }
-  \item{data}{the data frame to be used together with \code{fixed} and \code{random}}
-  \item{weights}{prior weights to be specified in weighted regression }
-  \item{fix.disp}{a numeric value if the dispersion parameter of the mean model is known for example 1 for binomial and Poisson model.}
-  \item{offset}{an offset for the linear predictor of the mean model.}
-  \item{\dots}{ not used }
+  \item{X}{\code{matrix}. The design matrix for the fixed effects.}
+  \item{y}{\code{numeric}. The dependent variable.}
+  \item{Z}{\code{matrix}. The design matrix for the random effects.}
+  \item{family}{\code{family}. The description of the error distribution and link function to be used in the mean part of the model. (See \code{\link{family}} for details of family functions.)}
+  \item{rand.family}{\code{family}. The description of the distribution and link function to be used for the random effect.}
+  \item{method}{\code{character}. Estimation method where \code{EQL} is the method of interconnected GLMs presented in Lee et al (2006). Currently only \code{EQL} is available as the estimation method.}
+  \item{conv}{\code{numeric}. The convergence criteria (change in linear predictor between iterations).}
+  \item{maxit}{\code{numeric}. Maximum number of iterations in the \code{hglm} algorithm.}
+  \item{startval}{\code{numeric}. A vector of starting values in the following order: fixed effects, random effect, variance of random effects, variance of residuals.}
+  \item{fixed}{\code{formula}. A \code{\link{formula}} specifying the fixed effects part of the model.}
+  \item{random}{\code{formula}. A one-sided \code{\link{formula}} specifying the random effects part of the model.}
+  \item{X.disp}{\code{matrix}. The design matrix for the fixed effects in the dispersion part of the model.}
+  \item{disp}{\code{formula}. A one-sided \code{\link{formula}} specifying the fixed effects in the dispersion part of the model.}
+  \item{link.disp}{\code{character}. The link function for the dispersion part of the model.}
+  \item{data}{\code{data.frame}. The data frame to be used together with \code{fixed} and \code{random}.}
+  \item{weights}{\code{numeric}. Prior weights to be specified in weighted regression.}
+  \item{fix.disp}{\code{numeric}. A numeric value if the dispersion parameter of the mean model is known, e.g., 1 for binomial and Poisson model.}
+  \item{offset}{An offset for the linear predictor of the mean model.}
+  \item{RandC}{\code{numeric}. Integers (possibly a vector) specifying the number of column of Z to be used for each of the random-effect terms.}
+  \item{sparse}{\code{logical}. If \code{TRUE}, the computation is to be carried out by using sparse matrix technique.}
+  \item{vcovmat}{\code{logical}. If \code{TRUE}, the variance-covariance matrix is returned.}
+  \item{\dots}{not used.}
 }
 \details{
   Models for \code{hglm} are either specified symbolically using \code{\link{formula}} 
@@ -48,39 +52,91 @@ weights=NULL, fix.disp=NULL, offset=NULL,...)
 }
 \value{
 It returns an object of class \code{hglm} consiting of the following values.
-  \item{fixef}{fixed effect estimates}
-  \item{ranef }{random effect estimates}
-  \item{varFix}{dispersion parameter of the mean model (residual variance for LMM)}
-  \item{varRanef}{dispersion parameter of the random effects (variance of random effects for GLMM)}
-  \item{iter}{number of iterations used}
-  \item{Converge}{specifies if the algorithm converged}
-  \item{SeFe}{standard errors of fixed effects}
-  \item{SeRe}{standard errors of random effects}
-  \item{dfReFe}{deviance degrees of freedom for the mean part of the model}
-  \item{SummVC1}{estimates and standard errors of the linear predictor in the dispersion model}
-  \item{SummVC2}{estimates and standard errors of the linear predictor for the dispersion parameter of the random effects}
-  \item{dev}{individual deviances for the mean part of the model}
-  \item{hv}{hatvalues for the mean part of the model}
-  \item{resid}{studentized residuals for the mean part of the model}
-  \item{fv}{fitted values for the mean part of the model}
-  \item{disp.fv}{fitted values for the dispersion part of the model}
-  \item{disp.resid}{standardized deviance residuals for the dispersion part of the model}
-  \item{link.disp}{link function for the dispersion part of the model}
+  \item{fixef}{fixed effect estimates.}
+  \item{ranef}{random effect estimates.}
+  \item{RandC}{integers (possibly a vector) specified the number of column of Z to be used for each of the random-effect terms.}
+  \item{varFix}{dispersion parameter of the mean model (residual variance for LMM).}
+  \item{varRanef}{dispersion parameter of the random effects (variance of random effects for GLMM).}
+  \item{iter}{number of iterations used.}
+  \item{Converge}{specifies if the algorithm converged.}
+  \item{SeFe}{standard errors of fixed effects.}
+  \item{SeRe}{standard errors of random effects.}
+  \item{dfReFe}{deviance degrees of freedom for the mean part of the model.}
+  \item{SummVC1}{estimates and standard errors of the linear predictor in the dispersion model.}
+  \item{SummVC2}{estimates and standard errors of the linear predictor for the dispersion parameter of the random effects.}
+  \item{dev}{individual deviances for the mean part of the model.}
+  \item{hv}{hatvalues for the mean part of the model.}
+  \item{resid}{studentized residuals for the mean part of the model.}
+  \item{fv}{fitted values for the mean part of the model.}
+  \item{disp.fv}{fitted values for the dispersion part of the model.}
+  \item{disp.resid}{standardized deviance residuals for the dispersion part of the model.}
+  \item{link.disp}{link function for the dispersion part of the model.}
+  \item{vcov}{the variance-covariance matrix.}
 }
 \references{Lee, Y., Nelder J. A. and Pawitan Y. (2006) \emph{Generalized Linear Models with Random Effect: a unified analysis via h-likelihood.}
 Chapman and Hall/CRC.}
 \author{Moudud Alam, Lars Ronnegard, Xia Shen}
 
-\seealso{ \code{\link{summary.hglm}}}
+\seealso{\code{\link{hglm2}}}
 \examples{
+# --------------------- #
+# semiconductor example #
+# --------------------- #
+
 data(semiconductor)
+
 h.gamma.normal <- hglm(fixed = y ~ x1 + x3 + x5 + x6,
                        random = ~ 1|Device,
                        family = Gamma(link = log),
-                       disp = ~ x2 + x3, data = semiconductor )
+                       disp = ~ x2 + x3, data = semiconductor)
 summary(h.gamma.normal)
 plot(h.gamma.normal, cex = .6, pch = 1,
      cex.axis = 1/.6, cex.lab = 1/.6,
      cex.main = 1/.6, mar = c(3, 4.5, 0, 1.5))
+
+# ------------------- #
+# redo it using hglm2 #
+# ------------------- #
+
+m1 <- hglm2(y ~ x1 + x3 + x5 + x6 + (1|Device),
+            family = Gamma(link = log),
+            disp = ~ x2 + x3, data = semiconductor)
+summary(m1)
+plot(m1, cex = .6, pch = 1,
+     cex.axis = 1/.6, cex.lab = 1/.6,
+     cex.main = 1/.6, mar = c(3, 4.5, 0, 1.5))
+
+# --------------------------------------------- #  
+# simulated example with 2 random effects terms #
+# --------------------------------------------- #  
+\dontrun{
+set.seed(911)
+x1 <- rnorm(100)
+x2 <- rnorm(100)
+x3 <- rnorm(100)
+z1 <- factor(rep(LETTERS[1:10], rep(10, 10)))
+z2 <- factor(rep(letters[1:5], rep(20, 5)))
+Z1 <- model.matrix(~ 0 + z1)
+Z2 <- model.matrix(~ 0 + z2)
+u1 <- rnorm(10, 0, sqrt(2))
+u2 <- rnorm(5, 0, sqrt(3))
+y <- 1 + 2*x1 + 3*x2 + Z1\%*\%u1 + Z2\%*\%u2 + rnorm(100, 0, sqrt(exp(x3)))
+dd <- data.frame(x1 = x1, x2 = x2, x3 = x3, z1 = z1, z2 = z2, y = y)
+
+(m2.1 <- hglm(X = cbind(rep(1, 100), x1, x2), y = y, Z = cbind(Z1, Z2), 
+              RandC = c(10, 5)))
+summary(m2.1)
+plot(m2.1)
+
+(m2.2 <- hglm2(y ~ x1 + x2 + (1|z1) + (1|z2), data = dd, vcovmat = TRUE))
+image(m2.2$vcov)
+summary(m2.2)
+plot(m2.2)
+
+m3 <- hglm2(y ~ x1 + x2 + (1|z1) + (1|z2), disp = ~ x3, data = dd)
+print (m3)
+summary(m3)
+plot(m3)
+}
 }
 

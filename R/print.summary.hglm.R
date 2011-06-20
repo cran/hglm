@@ -1,55 +1,88 @@
 `print.summary.hglm` <-
-function(x,digits=4,...){
-  cat("Call: \n")
-  print(x$call)
-  cat("\n")
-  cat("DISPERSION MODEL")
-  cat("\n")
-  if(x$Method=="REML"){
-    cat(paste("-2*Log(Profile-Likelihood) =",round(-2*x$ProfLogLik,digits),"\n"))
-  } else{
-    cat("WARNING: h-likelihood estimates through EQL can be biased.")
-    }
-  if(!is.null(x$varFix)){
-  if(is.null(x$SummVC1)){
-   cat("\n") 
-  cat(paste("Dispersion parameter held Constant at:", x$varFix))
-  } else{
-  cat("\n") 
-  cat("Model estimates for the dispersion term:")
-  print(x$varFix)
-  }
-  } 
-  if(!is.null(x$SummVC1)){
-  cat("\n")
-  cat(paste("Model estimates for the dispersion term:","\n","Link =", 
-  x$link.disp,"\n", "Effects:\n"))
-  print(round(x$SummVC1,digits))
-  cat("\n")
-  cat("Dispersion = 1 is used in Gamma model on deviances to calculate the standard error(s).")
-  }
-  if(!is.null(x$varRanef)){
-  cat("\n")
-  cat("Dispersion parameter for the random effects\n")
-  print(x$varRanef,digits=digits)
-  cat("\n")
-  cat(paste("Dispersion model for the random effects:","\n","Link = log","\n","Effects:\n"))
-  print(round(x$SummVC2,digits))
-  cat("\n")
-  cat("Dispersion = 1 is used in Gamma model on deviances to calculate the standard error(s).")
-  }
-  cat("\n")
-  cat("MEAN MODEL")
-  cat("\n")
-  cat("Summary of the fixed effects estimates \n")
-  printCoefmat(x$FixCoefMat,digits=digits,P.value=TRUE,has.Pvalue=TRUE)
-  cat(paste("Note: P-values are based on",x$devdf,"degrees of freedom"))
-  if(!is.null(x$RandCoefMat)){
-  cat("\n")
-  cat("Summary of the random effects estimate \n")
-  print(round(x$RandCoefMat,digits))
-  }
-  cat("\n")
-  cat(paste(x$Method,"estimation",x$converge,"in",x$iter,"iterations. \n"))
+	function(x, digits = 4, ...) {
+
+x$nRand <- cumsum(x$RandC)
+cat("Call: \n")
+print(x$call)
+cat("\n")
+cat('\n----------\n')
+cat("MEAN MODEL\n")
+cat('----------\n')
+cat("\n")
+cat("Summary of the fixed effects estimates:\n")
+cat("\n")
+printCoefmat(x$FixCoefMat, digits = digits, P.value = TRUE, has.Pvalue = TRUE)
+cat("Note: P-values are based on", x$devdf, "degrees of freedom\n")
+if (!is.null(x$RandCoefMat)) {
+	if (length(x$RandC) == 1) {
+		cat("\n")
+		cat("Summary of the random effects estimates:\n")
+		cat("\n")
+		print(round(x$RandCoefMat, digits))
+	} else {
+		for (J in 1:length(x$RandC)) {
+			cat("\n")
+			cat("Summary of the random effects estimates:\n")
+			cat("\n")
+			print(round(x$RandCoefMat[[J]], digits))
+		}
+	}
+}
+cat('\n')
+cat("----------------\n")
+cat("DISPERSION MODEL\n")
+cat("----------------\n")
+cat("\n")
+if (x$Method == "REML"){
+    cat("-2*Log(Profile-Likelihood) =", round(-2*x$ProfLogLik, digits), "\n")
+} else {
+    cat("WARNING: h-likelihood estimates through EQL can be biased.\n")
+}
+if (!is.null(x$varFix)) {
+	if (is.null(x$SummVC1)) {
+		cat("\n") 
+		cat("Dispersion parameter held Constant at:", x$varFix, '\n')
+	} else {
+		cat("\n") 
+		cat("Dispersion parameter for the mean model:\n")
+		print(x$varFix)
+	}
+} 
+if (!is.null(x$SummVC1)) {
+	cat("\n")
+	cat("Model estimates for the dispersion term:\n")
+	cat("\nLink =", x$link.disp, "\n")
+	cat("\nEffects:\n")
+	print(round(x$SummVC1, digits))
+	cat("\n")
+	cat("Dispersion = 1 is used in Gamma model on deviances to calculate the standard error(s).")
+}
+cat('\n')
+if (!is.null(x$varRanef)) {
+	cat("\n")
+	cat("Dispersion parameter for the random effects:\n")
+	print(x$varRanef, digits = digits)
+	cat("\n")
+	cat("Dispersion model for the random effects:\n")
+	cat("\nLink = log\n")
+	if (length(x$RandC) == 1) {
+		cat("\nEffects:\n")
+		cat(names(x$SummVC2), '\n')
+		print(round(x$SummVC2[[1]], digits))
+		cat("\n")
+	} else {
+		ranefnames <- names(x$SummVC2)
+		cat("\nEffects:\n")
+		for (J in 1:length(x$RandC)) {
+			cat(ranefnames[J], '\n')
+			print(round(x$SummVC2[[J]], digits))
+			cat("\n")
+		}
+	}
+	cat("Dispersion = 1 is used in Gamma model on deviances to calculate the standard error(s).\n")
+}
+cat("\n")
+cat(x$Method, "estimation", x$converge, "in", x$iter, "iterations.\n")
+
 }
 

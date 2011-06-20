@@ -1,103 +1,92 @@
 `hglm.formula` <-
- function(X=NULL,y=NULL,Z=NULL,family=gaussian(link=identity),
- rand.family=gaussian(link=identity), method="EQL",conv=1e-4,maxit=20,startval=NULL,
- fixed=NULL, random=NULL,X.disp=NULL,disp=NULL,
- link.disp="log",data=NULL,weights=NULL,fix.disp=NULL,offset=NULL,...) {
-  Call<-match.call()
-  #### check fixed effects formula ###########
-  if (!inherits(fixed, "formula") || length(fixed) != 3) {
-    stop("\n Fixed-effects model must be a formula of the form \"resp ~ pred\"")
-  }
-  ##### Get GLM family and link #######################################
-  ## Check random effetcst ############################################
-  if (!inherits(random, "formula")){
-    stop("\n Random part must be a one-sided formula of the form \" ~ effect|Cluster\"")
-  }
-  if(attr(terms(random),"response")!=0){
-    stop("\n Random part must be a one-sided formula of the form \" ~ effect|Cluster\"")
-  }
-  if(all.names(random)[2]!="|") {
-    stop("The subjects/clusters in Random must be separated by \" |\"")
-  }
-  #### Check the dispersion model ##########################
-  if(is.null(disp)){
-    x.disp<-NULL
-  } else {
-    if (!inherits(disp, "formula")){
-      stop("\n Dispersion model must be a one-sided formula of the form \" ~ effect\"")
+	function(X = NULL, y = NULL, Z = NULL, family = gaussian(link = identity),
+             rand.family = gaussian(link = identity), method = "EQL", conv = 1e-4, maxit = 20, startval = NULL,
+             fixed = NULL, random = NULL, X.disp = NULL, disp = NULL,
+             link.disp = "log", data = NULL, weights = NULL, fix.disp = NULL, offset = NULL, 
+             RandC = NULL, sparse = TRUE, vcovmat = FALSE, ...) {
+
+Call <- match.call()
+
+### check fixed effects formula ###
+if (!inherits(fixed, "formula") || length(fixed) != 3) stop("\n Fixed-effects model must be a formula of the form \"resp ~ pred\"")
+
+### Get GLM family and link ###
+### Check random effects ###
+if (!inherits(random, "formula")) stop("\n Random part must be a one-sided formula of the form \" ~ effect|Cluster\"")
+if (attr(terms(random), "response") != 0) stop("\n Random part must be a one-sided formula of the form \" ~ effect|Cluster\"")
+if (all.names(random)[2] != "|") stop("The subjects/clusters in Random must be separated by \" |\"")
+
+### Check the dispersion model ###
+if (is.null(disp)) {
+    x.disp <- NULL
+} else {
+	if (!inherits(disp, "formula")) stop("\n Dispersion model must be a one-sided formula of the form \" ~ effect\"")
+    if (attr(terms(disp), "response") != 0) stop("\n Dispersion model must be a one-sided formula of the form \" ~ effect\"")
+	### Create design matrix for the dispersion model ###
+	DispModel <- model.frame(disp, data)
+	x.disp <- model.matrix(attr(DispModel, "terms"), data = DispModel)
+	row.names(x.disp) <- NULL
+}
+### random effects part is checked ###
+
+### Create design matrix for the fixed effects ###
+mf <- match.call(expand.dots = FALSE)
+m <- match(c("data", "weights", "offset"), names(mf), 0)
+mf <- mf[c(1, m)]
+mf$formula <- fixed
+mf$drop.unused.levels <- TRUE
+mf[[1]] <- as.name("model.frame")
+mf <- eval(mf, parent.frame())
+mt <- attr(mf, "terms")
+Y <- model.response(mf)
+X <- if (!is.empty.model(mt)) model.matrix(attr(mf, "terms"), data = mf) else matrix(, NROW(Y), 0)
+weights <- as.vector(model.weights(mf))
+if (!is.null(weights) && !is.numeric(weights)) stop("'weights' must be a numeric vector")
+offset <- as.vector(model.offset(mf))
+if (!is.null(weights) && any(weights < 0)) stop("negative weights not allowed")
+if (!is.null(offset)) {
+	if (length(offset) == 1)
+		offset <- rep(offset, NROW(Y))
+    else if (length(offset) != NROW(Y))
+        stop(gettextf("number of offsets is %d should equal %d (number of observations)", length(offset), NROW(Y)), domain = NA)
+}
+row.names(X) <- NULL
+if (is.factor(Y)) {
+	if (family$family == "binomial") {
+		FactorY <- names(table(Y))
+		if (length(FactorY) > 2) warning("More than 2 factors in Binomial response is ambiguous and the last category is considered as success")
+		Y <- as.numeric(Y == FactorY[length(FactorY)])
+	} else stop(paste("response must be numeric for", family$family, "family."))
+}
+
+### Create z matrix ###
+RanTerm <- unlist(strsplit(attr(terms(random), "term.labels"), split = "|", fixed = TRUE))
+if (length(RanTerm) > 2) stop("Currently only one random term is supported.")
+RanTerm <- gsub(pattern = " ", replacement = "", RanTerm)
+if (!is.factor(data[1:2, RanTerm[2]])) {
+	if ((length(RanTerm) == 2) & (RanTerm[1] == "1")) {     
+		ranf <- paste("~", "as.factor(", RanTerm[2], ")", "-1", sep = "")
+	} else {
+		ranf <- paste("~", "(", RanTerm[1], ")", ":as.factor(", RanTerm[2], ")", "-1", sep = "")
+	}
+} else {
+	if ((length(RanTerm) == 2) & (RanTerm[1] == "1")) {
+		ranf <- paste("~", RanTerm[2], "-1", sep = "")
+	} else {
+		ranf <- paste("~", "(", RanTerm[1], ")", ":", RanTerm[2], "-1", sep = "")
     }
-    if(attr(terms(disp),"response")!=0){
-      stop("\n Dispersion model must be a one-sided formula of the form \" ~ effect\"")
-    }
-   ### Create design matrix for the dispersion model #########
-   DispModel<-model.frame(disp,data)
-   x.disp=model.matrix(attr(DispModel,"terms"),data=DispModel)
-   row.names(x.disp)<-NULL
-  }
-  ########## random effects part is checked #############################
-  #### Create design matrix for the fixed effects #######################
-    mf <- match.call(expand.dots = FALSE)
-    m <- match(c("data","weights","offset"), names(mf), 0)
-    mf <- mf[c(1, m)]
-    mf$formula<-fixed
-    mf$drop.unused.levels <- TRUE
-    mf[[1]] <- as.name("model.frame")
-    mf <- eval(mf, parent.frame())
-    mt <- attr(mf, "terms")
-     Y <- model.response(mf)
-     X <- if (!is.empty.model(mt))
-        model.matrix(attr(mf,"terms"), data=mf)
-    else matrix(, NROW(Y), 0)
-    weights <- as.vector(model.weights(mf))
-    if (!is.null(weights) && !is.numeric(weights))
-        stop("'weights' must be a numeric vector")
-    offset <- as.vector(model.offset(mf))
-    if (!is.null(weights) && any(weights < 0))
-        stop("negative weights not allowed")
-    if (!is.null(offset)) {
-        if (length(offset) == 1)
-            offset <- rep(offset, NROW(Y))
-        else if (length(offset) != NROW(Y))
-            stop(gettextf("number of offsets is %d should equal %d (number of observations)",
-                length(offset), NROW(Y)), domain = NA)
-      }
-  row.names(X)<-NULL
-  if(is.factor(Y)){
-    if(family$family=="binomial"){
-      FactorY<-names(table(Y))
-      if(length(FactorY)>2) warning("More than 2 factors in Binomial response is 
-      ambiguous and the last category is considered as success")
-      Y<-as.numeric(Y==FactorY[length(FactorY)])
-    } else {
-      stop(paste("response must be numeric for",family$family,"family."))
-    }
-  }
-  ######## Create z matrix #############################################
-  RanTerm<-unlist(strsplit(attr(terms(random),"term.labels"),split="|",fixed=TRUE))
-  if(length(RanTerm)>2) stop("Currently only one random term is supported.")
-  RanTerm<-gsub(pattern=" ",replacement="",RanTerm)
-  if(!is.factor(data[1:2,RanTerm[2]])){
-   if((length(RanTerm)==2) & (RanTerm[1]=="1")){     
-      ranf<-paste("~","as.factor(",RanTerm[2],")","-1",sep="")
-    }
-    else {
-      ranf<-paste("~","(",RanTerm[1],")",":as.factor(",RanTerm[2],")","-1",sep="")
-    }
-  } else {
-   if((length(RanTerm)==2) & (RanTerm[1]=="1")){
-      ranf<-paste("~",RanTerm[2],"-1",sep="")
-   } else {
-      ranf<-paste("~","(",RanTerm[1],")",":",RanTerm[2],"-1",sep="")
-    }
-  }
-  ranf<-as.formula(ranf)
-  rmf<-model.frame(ranf,data)
-  z<-model.matrix(attr(rmf,"terms"),data=rmf)
-  row.names(z)<-NULL
-  val<-hglm.default(X=X,y=Y,Z=z,family=family,rand.family=rand.family, X.disp=x.disp,
-  link.disp=link.disp,method=method,conv=conv,maxit=maxit,startval=startval,
-  weights=weights,fix.disp=fix.disp,offset=offset,...)
-  val$call<-Call
-  return(val)
+}
+ranf <- as.formula(ranf)
+rmf <- model.frame(ranf, data)
+z <- model.matrix(attr(rmf, "terms"), data = rmf)
+row.names(z) <- NULL
+
+val <- hglm.default(X = X, y = Y, Z = z, family = family, rand.family = rand.family, X.disp = x.disp,
+                    link.disp = link.disp, method = method, conv = conv, maxit = maxit, startval = startval,
+                    weights = weights, fix.disp = fix.disp, offset = offset, vcovmat = vcovmat, ...)
+val$call <- Call
+
+return(val)
+
 }
 

@@ -1,0 +1,10 @@
+import("Matrix")
+export("hglm", "hglm2")
+
+S3method(hglm, default)
+S3method(hglm, formula)
+S3method(hglm2, formula)
+S3method(print, hglm)
+S3method(summary, hglm)
+S3method(plot, hglm)
+S3method(print, summary.hglm)

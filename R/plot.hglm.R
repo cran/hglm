@@ -1,48 +1,22 @@
 `plot.hglm` <-
-function(x, pch = "+", col.theme = "colorful", output = "screen",
-filename = "HGLMplot", ...) {
+	function(x, pch = "+", pcol = 4, lcol = 2, ...) {
+	
 	residuals <- x$resid
 	fitted.values <- x$fv
 	disp.residuals <- x$disp.resid
 	disp.fitted.values <- x$disp.fv
 	hatvalues <- x$hv
 	deviances <- x$dev
-#p <- x$p
-#cook.dis <- deviances/(p*sum(deviances))*hatvalues/(1 - hatvalues)**2
-	if (col.theme == "colorful") {
-		pcol <- 4
-		lcol <- 2
-	}
-	else {
-		if (col.theme == "blackwhite") {
-			pcol <- lcol <- 1
-		}
-		else {
-			stop("Incorrect color theme is specified!")
-		}
-	}
-	if (is.null(disp.fitted.values)) idx <- c(1,3) else idx <- 1:3
+	x$nRand <- cumsum(x$RandC)
+	#p <- x$p
+	#cook.dis <- deviances/(p*sum(deviances))*hatvalues/(1 - hatvalues)**2
+	if (is.null(nrow(x$SummVC1))) idx <- c(1, 3, 4) else idx <- 1:4
 	for (i in idx) {
-		if (output == "screen") {
-			if (i > 1) {
-				dev.new()
-			}
-		}
-		else {
-			if (output == "postscript") {
-				postscript(paste(filename, i, ".ps", sep = ""))
-			}
-			else {
-				if (output == "pdf") {
-					pdf(paste(filename, i, ".pdf", sep = ""))
-				}
-				else {
-					stop("Incorrect output format specified!")
-				}
-			}
+		if (i > 1) {
+			dev.new()
 		}
 		if (i == 1) {
-			par(mfrow = c(2,2), pty = "s", ...)
+			par(mfrow = c(2, 2), pty = "s", ...)
 			loess.fit <- loess.smooth(fitted.values, residuals)
 			plot(fitted.values, residuals, xlab = "Fitted Values", 
 				 ylab = "Studentized Residuals", pch = pch, col = pcol, bty = "n", main = "Mean Model (a)")
@@ -58,7 +32,7 @@ filename = "HGLMplot", ...) {
 		}
 		else {
 			if (i == 2) {
-				par(mfrow = c(2,2), pty = "s", ...)
+				par(mfrow = c(2, 2), pty = "s", ...)
 				loess.fit <- loess.smooth(disp.fitted.values, disp.residuals)
 				plot(disp.fitted.values, disp.residuals, xlab = "Fitted Values", 
 					 ylab = "Standardized Deviance Residuals", pch = pch, col = pcol, bty = "n", main = "Dispersion Model (a)")
@@ -74,27 +48,56 @@ filename = "HGLMplot", ...) {
 			}
 			else {
 				if (i == 3) {
-					par(mfrow = c(2,2), pty = "s", ...)
-					plot(hatvalues, ylab = "Hat-values", pch = pch, col = pcol, bty = "n")
-					plot(deviances, ylab = "Deviances", pch = pch, col = pcol, bty = "n")
-					beta <- var(deviances)/mean(deviances)
-					alpha <- mean(deviances)/beta
-  					if (length(deviances) < 5001) max.L <- 10000
-  					if (length(deviances) > 5000) max.L <- length(deviances)*10
+					par(mfrow = c(1, 2), pty = "s", ...)
+					plot(hatvalues, ylab = "Hat-values", main = "Hat-values", pch = pch, col = pcol, bty = "n")
+					plot(deviances, ylab = "Deviances", main = "Deviances", pch = pch, col = pcol, bty = "n")
+				} else {
+					par(mfrow = c(length(x$RandC) + 1, 2))
+					devid <- 1:(length(deviances) - max(x$nRand))
+					beta <- var(deviances[devid])/mean(deviances[devid])
+					alpha <- mean(deviances[devid])/beta
+  					if (length(deviances[devid]) < 5001) max.L <- 10000
+  					if (length(deviances[devid]) > 5000) max.L <- length(deviances[devid])*10
   					xx <- rgamma(max.L, alpha, 1/beta) 
-  					steps <- floor(max.L/length(deviances))
-  					vec.indx <- steps*(1:length(deviances)) - round(steps/2)
+  					steps <- floor(max.L/length(deviances[devid]))
+  					vec.indx <- steps*(1:length(deviances[devid])) - round(steps/2)
   					x.alt <- sort(xx)[vec.indx]
-  					sy <- sort(deviances)
-  					plot(x.alt, sy, main="", col = pcol, pch = pch, bty = "n", ylab = "Deviance Quantiles", xlab="Gamma Quantiles")
-					#qqplot(rgamma(9999, alpha, 1/beta), deviances, col = pcol, pch = pch, xlab = "Gamma Quantiles", ylab = "Deviance Quantiles", bty = "n")
+  					sy <- sort(deviances[devid])
+  					plot(x.alt, sy, main = "Mean Model Deviances", col = pcol, pch = pch, bty = "n", ylab = "Deviance Quantiles", xlab="Gamma Quantiles")
 					abline(0, 1, col = lcol)
-					hist(deviances, density = 15, xlab = "Deviances", main = "", col = pcol)
+					hist(deviances[devid], density = 15, xlab = "Deviances", main = "Mean Model Deviances", col = pcol)
+					devid <- (length(deviances) - max(x$nRand) + 1):(length(deviances) - max(x$nRand) + x$nRand[1])
+					beta <- var(deviances[devid])/mean(deviances[devid])
+					alpha <- mean(deviances[devid])/beta
+  					if (length(deviances[devid]) < 5001) max.L <- 10000
+  					if (length(deviances[devid]) > 5000) max.L <- length(deviances[devid])*10
+  					xx <- rgamma(max.L, alpha, 1/beta) 
+  					steps <- floor(max.L/length(deviances[devid]))
+  					vec.indx <- steps*(1:length(deviances[devid])) - round(steps/2)
+  					x.alt <- sort(xx)[vec.indx]
+  					sy <- sort(deviances[devid])
+  					plot(x.alt, sy, main = paste(names(x$SummVC2)[1], "Deviances"), col = pcol, pch = pch, bty = "n", ylab = "Deviance Quantiles", xlab="Gamma Quantiles")
+					abline(0, 1, col = lcol)
+					hist(deviances[devid], density = 15, xlab = "Deviances", main = paste(names(x$SummVC2)[1], "Deviances"), col = pcol)
+					if (length(x$RandC) > 1) {
+						for (J in 2:length(x$RandC)) {
+							devid <- (length(deviances) - max(x$nRand) + x$nRand[J - 1] + 1):(length(deviances) - max(x$nRand) + x$nRand[J])
+							beta <- var(deviances[devid])/mean(deviances[devid])
+							alpha <- mean(deviances[devid])/beta
+  							if (length(deviances[devid]) < 5001) max.L <- 10000
+  							if (length(deviances[devid]) > 5000) max.L <- length(deviances[devid])*10
+  							xx <- rgamma(max.L, alpha, 1/beta) 
+  							steps <- floor(max.L/length(deviances[devid]))
+  							vec.indx <- steps*(1:length(deviances[devid])) - round(steps/2)
+  							x.alt <- sort(xx)[vec.indx]
+  							sy <- sort(deviances[devid])
+  							plot(x.alt, sy, main = paste(names(x$SummVC2)[J], "Deviances"), col = pcol, pch = pch, bty = "n", ylab = "Deviance Quantiles", xlab="Gamma Quantiles")
+							abline(0, 1, col = lcol)
+							hist(deviances[devid], density = 15, xlab = "Deviances", main = paste(names(x$SummVC2)[J], "Deviances"), col = pcol)
+						}
+					}
 				}
 			}
-		}
-		if (output != "screen") {
-			dev.off()
 		}
 	}
 }
