@@ -10,7 +10,7 @@
 
 \begin{document}
 
-\includepdf[pages={1-28}, fitpaper=true]{hglmdoc.pdf}
+\includepdf[pages={1-38}, fitpaper=true]{hglmdoc.pdf}
 
 \end{document}
 

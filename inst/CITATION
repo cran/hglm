@@ -1,0 +1,20 @@
+citHeader("To cite hglm in publications use:")
+
+citEntry(entry="Article",
+         title = "hglm: A Package for Fitting Hierarchical Generalized Linear Models",
+         author = personList(as.person("Lars Ronnegard"),
+                             as.person("Xia Shen"),
+                             as.person("Moudud Alam")),
+         journal      = "The R Journal",
+         year         = "2010",
+         volume       = "2",
+         number       = "2",
+         url          = "http://journal.r-project.org/archive/2010-2/RJournal_2010-2_Roennegaard~et~al.pdf",
+         
+         textVersion = 
+         paste("Lars Ronnegard, Xia Shen and Moudud Alam (2010).", 
+               "hglm: A Package for Fitting Hierarchical Generalized Linear Models.",
+               "The R Journal.",
+               "URL http://journal.r-project.org/archive/2010-2/RJournal_2010-2_Roennegaard~et~al.pdf.")
+)
+

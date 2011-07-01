@@ -10,7 +10,7 @@
 function(...)
 {
  cat("hglm: Hierarchical Generalized Linear Models\n")
- cat('Version 1.2-1 installed\n')
+ cat('Version 1.2-2 installed\n')
  cat('\n')
  cat('Authors:    Moudud Alam - maa@du.se\n')
  cat('            Xia Shen - xia.shen@icm.uu.se\n')
