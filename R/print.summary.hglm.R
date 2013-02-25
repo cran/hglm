@@ -1,5 +1,5 @@
 `print.summary.hglm` <-
-	function(x, digits = 4, ...) {
+	function(x, digits = 4, print.ranef = FALSE, ...) {
 
 x$nRand <- cumsum(x$RandC)
 cat("Call: \n")
@@ -11,20 +11,36 @@ cat('----------\n')
 cat("\n")
 cat("Summary of the fixed effects estimates:\n")
 cat("\n")
-printCoefmat(x$FixCoefMat, digits = digits, P.value = TRUE, has.Pvalue = TRUE)
+printCoefmat(x$FixCoefMat, digits = digits, P.values = TRUE, has.Pvalue = TRUE)
 cat("Note: P-values are based on", x$devdf, "degrees of freedom\n")
 if (!is.null(x$RandCoefMat)) {
 	if (length(x$RandC) == 1) {
 		cat("\n")
 		cat("Summary of the random effects estimates:\n")
 		cat("\n")
-		print(round(x$RandCoefMat, digits))
+		if (nrow(x$RandCoefMat) <= 5) {
+			print(round(x$RandCoefMat, digits))
+		} else if (print.ranef) {
+			print(round(x$RandCoefMat, digits))
+		} else {
+			print(round(x$RandCoefMat[1:3,], digits))
+			cat('...\n')
+			cat('NOTE: to show all the random effects estimates, use print(summary(hglm.object), print.ranef = TRUE).\n')
+		}
 	} else {
 		for (J in 1:length(x$RandC)) {
 			cat("\n")
 			cat("Summary of the random effects estimates:\n")
 			cat("\n")
-			print(round(x$RandCoefMat[[J]], digits))
+			if (nrow(x$RandCoefMat[[J]]) <= 5) {
+				print(round(x$RandCoefMat[[J]], digits))
+			} else if (print.ranef) {
+				print(round(x$RandCoefMat[[J]], digits))
+			} else {
+				print(round(x$RandCoefMat[[J]][1:3,], digits))
+				cat('...\n')
+				cat('NOTE: to show all the random effects estimates, use print(summary(hglm.object), print.ranef = TRUE).\n')
+			}
 		}
 	}
 }
@@ -82,6 +98,18 @@ if (!is.null(x$varRanef)) {
 	cat("Dispersion = 1 is used in Gamma model on deviances to calculate the standard error(s).\n")
 }
 cat("\n")
+if (!is.null(x$likelihood)) {
+	cat("-----------\n")
+	cat("LIKELIHOODS\n")
+	cat("-----------\n")
+	cat("\n")
+	cat("h-likelihood:", x$likelihood$hlik, "\n")
+	cat("Adjusted profile likelihood", "\n") 
+	cat("   Profiled over random effects:", x$likelihood$pvh, "\n")
+	cat("   Profiled over fixed and random effects:", x$likelihood$pbvh, "\n")
+	cat("Conditional AIC:", x$likelihood$cAIC, "\n")
+	cat("\n")
+}
 cat(x$Method, "estimation", x$converge, "in", x$iter, "iterations.\n")
 
 }

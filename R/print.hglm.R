@@ -1,5 +1,5 @@
 `print.hglm` <-
-	function(x, ...) {
+	function(x, print.ranef = FALSE, ...) {
 
 x$nRand <- cumsum(x$RandC)
 cat("Call: \n")
@@ -12,16 +12,49 @@ cat("Fixed effects:\n")
 print(x$fixef)
 cat('\n')
 if (length(x$RandC) == 1) {
-	cat("Random effects:\n")
-	print(x$ranef)
+	if (length(x$ranef) <= 5) {
+		cat("Random effects:\n")
+		print(x$ranef)
+	} else if (print.ranef) {
+		cat("Random effects:\n")
+		print(x$ranef)
+	} else {
+		cat("Random effects:\n")
+		print(x$ranef[1:3])
+		cat('...\n')
+		print(x$ranef[(x$nRand[1] - 1):x$nRand[1]])
+		cat('NOTE: to show all the random effects estimates, use print(hglm.object, print.ranef = TRUE).\n')
+	}
 	cat('\n')
 } else {
-	cat("Random effects:\n")
-	print(x$ranef[1:x$nRand[1]])
+	if (length(x$ranef[1:x$nRand[1]]) <= 5) {
+		cat("Random effects:\n")
+		print(x$ranef[1:x$nRand[1]])
+	} else if (print.ranef) {
+		cat("Random effects:\n")
+		print(x$ranef[1:x$nRand[1]])
+	} else {
+		cat("Random effects:\n")
+		print(x$ranef[1:3])
+		cat('...\n')
+		print(x$ranef[(x$nRand[1] - 1):x$nRand[1]])
+		cat('NOTE: to show all the random effects estimates, use print(hglm.object, print.ranef = TRUE).\n')
+	}
 	cat('\n')
 	for (J in 2:length(x$RandC)) {
-		cat("Random effects:\n")
-		print(x$ranef[(x$nRand[J - 1] + 1):x$nRand[J]])
+		if (length(x$ranef[(x$nRand[J - 1] + 1):x$nRand[J]]) <= 5) {
+			cat("Random effects:\n")
+			print(x$ranef[(x$nRand[J - 1] + 1):x$nRand[J]])
+		} else if (print.ranef) {
+			cat("Random effects:\n")
+			print(x$ranef[(x$nRand[J - 1] + 1):x$nRand[J]])
+		} else {
+			cat("Random effects:\n")
+			print(x$ranef[(x$nRand[J - 1] + 1):(x$nRand[J - 1] + 3)])
+			cat('...\n')
+			print(x$ranef[(x$nRand[J] - 1):x$nRand[J]])
+			cat('NOTE: to show all the random effects estimates, use print(hglm.object, print.ranef = TRUE).\n')
+		}
 		cat('\n')
 	}
 }

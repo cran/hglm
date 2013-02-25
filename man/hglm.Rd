@@ -11,10 +11,11 @@
 \usage{
 hglm(X = NULL, y = NULL, Z = NULL, family = gaussian(link = identity),
      rand.family = gaussian(link = identity), method = "EQL",
-     conv = 1e-4, maxit = 20, startval = NULL, fixed = NULL, random = NULL,
+     conv = 1e-6, maxit = 20, startval = NULL, fixed = NULL, random = NULL,
      X.disp = NULL, disp = NULL, link.disp = "log", data = NULL, 
      weights = NULL, fix.disp=NULL, offset = NULL, 
-     RandC = NULL, sparse = TRUE, vcovmat = FALSE, ...)
+     RandC = NULL, sparse = TRUE, vcovmat = FALSE, calc.like = FALSE, 
+     bigRR = FALSE, verbose = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -39,6 +40,9 @@ hglm(X = NULL, y = NULL, Z = NULL, family = gaussian(link = identity),
   \item{RandC}{\code{numeric}. Integers (possibly a vector) specifying the number of column of Z to be used for each of the random-effect terms.}
   \item{sparse}{\code{logical}. If \code{TRUE}, the computation is to be carried out by using sparse matrix technique.}
   \item{vcovmat}{\code{logical}. If \code{TRUE}, the variance-covariance matrix is returned.}
+  \item{calc.like}{logical. If \code{TRUE}, likelihoods will be computed at convergence and will be shown via the print or summary methods on the output object.}
+  \item{bigRR}{logical. If \code{TRUE}, and only for the Gaussian model with one random effect term, a specific algorithm will be used for fast fitting high-dimensional (p >> n) problems. See Shen et al. (2013) for more details of the method.}
+  \item{verbose}{logical. If \code{TRUE}, more information is printed during model fitting process.}
   \item{\dots}{not used.}
 }
 \details{
@@ -73,8 +77,13 @@ It returns an object of class \code{hglm} consiting of the following values.
   \item{link.disp}{link function for the dispersion part of the model.}
   \item{vcov}{the variance-covariance matrix.}
 }
-\references{Lee, Y., Nelder J. A. and Pawitan Y. (2006) \emph{Generalized Linear Models with Random Effect: a unified analysis via h-likelihood.}
-Chapman and Hall/CRC.}
+\references{
+Ronnegard, Lars, Xia Shen and Moudud Alam (2010). \bold{hglm: A Package for Fitting Hierarchical Generalized Linear Models}. \emph{The R Journal}, \bold{2}(2), 20-28.\cr\cr
+
+Lee, Youngjo, John A Nelder and Yudi Pawitan (2006) \emph{Generalized Linear Models with Random Effect: a unified analysis via h-likelihood.} Chapman and Hall/CRC.\cr\cr
+
+Shen, Xia, Moudud Alam, Freddy Fikse and Lars Ronnegard (2013). \bold{A novel generalized ridge regression method for quantitative genetics}. \emph{Genetics}.
+}
 \author{Moudud Alam, Lars Ronnegard, Xia Shen}
 
 \seealso{\code{\link{hglm2}}}

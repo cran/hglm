@@ -16,21 +16,26 @@ REML for linear mixed models.
 \tabular{ll}{
 Package: \tab hglm\cr
 Type: \tab Package\cr
-Version: \tab 1.2-2\cr
-Date: \tab 2011-07-01\cr
+Version: \tab 1.2-5\cr
+Date: \tab 2013-02-25\cr
+Discussion: \tab https://r-forge.r-project.org/forum/?group_id=558\cr
+BugReports: \tab https://r-forge.r-project.org/tracker/?group_id=558\cr
 License: \tab GPL\cr
 LazyLoad: \tab yes\cr
-Depends: \tab Matrix, MASS\cr
+Depends: \tab Matrix, MASS, dglm\cr
 }
-This is version 1.2-2 of the hglm package. 
+This is version 1.2-5 of the hglm package. 
 }
 \author{
-Moudud Alam, Xia Shen, Lars Ronnegard\cr
+Moudud Alam, Xia Shen, Lars Ronnegard\cr\cr
 Maintainer: Lars Ronnegard <lrn@du.se>
 }
 \references{
-Lee, Y., Nelder J. A. and Pawitan Y. (2006) \emph{Generalized Linear Models with Random Effect: a unified analysis via h-likelihood.}
-Chapman and Hall/CRC.
+Ronnegard, Lars, Xia Shen and Moudud Alam (2010). \bold{hglm: A Package for Fitting Hierarchical Generalized Linear Models}. \emph{The R Journal}, \bold{2}(2), 20-28.\cr\cr
+
+Lee, Youngjo, John A Nelder and Yudi Pawitan (2006) \emph{Generalized Linear Models with Random Effect: a unified analysis via h-likelihood.} Chapman and Hall/CRC.\cr\cr
+
+Shen, Xia, Moudud Alam, Freddy Fikse and Lars Ronnegard (2013). \bold{A novel generalized ridge regression method for quantitative genetics}. \emph{Genetics}.
 }
 
 \keyword{package}

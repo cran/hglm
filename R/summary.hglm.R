@@ -46,7 +46,8 @@ if (!is.null(object$ranef)) {
 smst <- list(Method = Method, FixCoefMat = FixCoefMat, RandCoefMat = RandCoefMat, RandC = object$RandC,
              nRand = object$nRand, SummVC1 = object$SummVC1, SummVC2 = object$SummVC2, iter = object$iter,
              converge = object$Converge, call = Call, ProfLogLik = object$ProfLogLik, devdf = object$dfReFe,
-             LogLik = object$LogLik, varFix = object$varFix, varRanef = object$varRanef, link.disp = object$link.disp)
+             LogLik = object$LogLik, varFix = object$varFix, varRanef = object$varRanef, link.disp = object$link.disp,
+			 likelihood = object$likelihood)
   
 class(smst) <- "summary.hglm"
   

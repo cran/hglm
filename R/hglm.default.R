@@ -1,8 +1,10 @@
 `hglm.default` <-
 	function(X = NULL, y = NULL, Z = NULL, family = gaussian(link = identity),
-             rand.family = gaussian(link = identity), method = "EQL", conv = 1e-4, maxit = 50, startval = NULL,
-             fixed = NULL, random = NULL, X.disp = NULL, disp = NULL, link.disp = "log", data = NULL, 
-             weights = NULL, fix.disp = NULL, offset = NULL, RandC = ncol(Z), sparse = TRUE, vcovmat = FALSE, ...) {
+             rand.family = gaussian(link = identity), method = "EQL", conv = 1e-6, maxit = 50, 
+			 startval = NULL, fixed = NULL, random = NULL, X.disp = NULL, disp = NULL, 
+			 link.disp = "log", data = NULL, weights = NULL, fix.disp = NULL, offset = NULL, 
+			 RandC = ncol(Z), sparse = TRUE, vcovmat = FALSE, calc.like = FALSE, 
+			 bigRR = FALSE, verbose = FALSE, ...) {
 
 Call <- match.call()
 if (is.null(X)) stop("X is missing with no default")
@@ -111,6 +113,9 @@ else if (link.disp == "inverse") {
 } 
 else stop("link.disp must be a valid link for the Gamma family GLM") 
 
+### bigRR? ###
+if (!bigRR) {
+if (family$family == "gaussian" & ncol(z) > nrow(z) & length(RandC) == 1) cat("NOTE: You are fitting a normal model with one random effect term, and the number of effects (p) is greater than the number of observations (n). Turning on the argument 'bigRR' may speed up a lot if p >> n.\n")
 ### Check starting values ###
 if (!is.null(startval)) {
     if (!is.numeric(startval)) stop("Non-numeric starting value is not allowed")
@@ -260,16 +265,25 @@ while (iter <= maxit) {
 		rm(list = c("g12", "SummarySt", "devu", "hvu"))
 		devused <- devtouse
 	}
-	if (is.null(colnames(Z))) {
+	#if (is.null(colnames(Z))) { # names simplified, xia 130221
     	names(VC2) <- paste(".|Random", 1:k, sep = "")
-    } else {
-    	CVnames <- unlist(strsplit(z.names[nRand], "\\:"))
-    	names(VC2) <- CVnames[seq(1, length(CVnames), by = 2)]
+    #} else {
+    #	CVnames <- unlist(strsplit(z.names[nRand], "\\:"))
+    #	names(VC2) <- CVnames[seq(1, length(CVnames), by = 2)]
+	#}
+	if (verbose) {
+		cat("\n-------------------")
+		cat("\nIteration", iter, "\n")
+		cat("-------------------\n")
+		cat("Fitted residual variance:", sigma2e, "\n")
+		cat("Fitted random effects variance:", exp(as.numeric(unlist(VC2)[seq(1, 2*k, 2)])), "\n")
+		cat("Sum of squared linear predictor:", sum(eta.i^2), "\n")
+		cat("Convergence:", sum((eta0 - eta.i)^2)/sum(eta.i^2), "\n")
 	}
 	if (sum((eta0 - eta.i)^2) < conv*sum(eta.i^2) & iter > 1) break
-    eta0 <- eta.i
     if (!is.null(z)) w <- sqrt(as.numeric(c((dmu_deta^2/family$variance(mu.i))*(1/tau), (du_dv^2/rand.family$variance(ui))*(1/phi)))*prior.weights)
     if (is.null(z)) w <- sqrt(as.numeric((dmu_deta^2/family$variance(mu.i))*(1/tau))*prior.weights)
+	eta0 <- eta.i
     iter <- iter + 1
 }
 names(b.hat) <- x.names
@@ -280,7 +294,8 @@ if (!is.null(z)) ranef <- ui else ranef <- phi <- NULL
 val <- list(call = Call, fixef = fixef, ranef = ranef, RandC = RandC, phi = phi, varFix = sigma2e, 
             varRanef = sigma2u, iter = iter, Converge = "did not converge", SeFe = NULL, SeRe = NULL,
             dfReFe = NULL, SummVC1 = NULL, SummVC2 = NULL, method = method, dev = dev, hv = hv, 
-            resid = resid, fv = fv, disp.fv = disp.fv, disp.resid = disp.resid, link.disp = link.disp, vcov = NULL)
+            resid = resid, fv = fv, disp.fv = disp.fv, disp.resid = disp.resid, link.disp = link.disp, 
+			vcov = NULL, likelihood = NULL)
 
 if (iter < maxit) {
 	val$Converge <- "converged"
@@ -336,6 +351,8 @@ if (iter < maxit) {
     	}
 	}
 
+	if (calc.like) val$likelihood <- likelihood(val, y, X, Z)
+	
 ##### Calculate Profile Likelihood ##########
 #  Sigma <- Matrix(diag(tau))
 #    if (!is.null(z)) {
@@ -356,7 +373,19 @@ if (iter < maxit) {
 } else {
 	val$iter <- iter - 1
 }
-	
+
+} else {
+	model <- bigRR(formula = NULL, y = y, X = X, Z = Z, data = data, shrink = NULL, weight = NULL,
+   				   family = family, lambda = NULL, impute = FALSE, tol.err = 1e-6, 
+				   tol.conv = conv, only.estimates = FALSE, GPU = FALSE)
+		   
+	val <- list(call = Call, fixef = model$beta, ranef = model$u, RandC = RandC, phi = rep(model$lambda, RandC), varFix = model$phi, 
+			   varRanef = model$lambda, iter = model$hglm$iter, Converge = model$hglm$Converge, SeFe = model$hglm$SeFe, SeRe = model$hglm$SeRe,
+			   dfReFe = model$hglm$dfReFe, SummVC1 = model$hglm$SummVC1, SummVC2 = model$hglm$SummVC2, method = method, dev = model$hglm$dev, hv = NULL, 
+			   resid = model$hglm$resid, fv = model$hglm$fv, disp.fv = NULL, disp.resid = NULL, link.disp = NULL, 
+			   vcov = model$hglm$vcov, likelihood = model$hglm$likelihood)
+}
+
 class(val) <- "hglm"
 	
 return(val)
