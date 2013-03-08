@@ -118,20 +118,20 @@ if (!bigRR) {
 if (family$family == "gaussian" & ncol(z) > nrow(z) & length(RandC) == 1) cat("NOTE: You are fitting a normal model with one random effect term, and the number of effects (p) is greater than the number of observations (n). Turning on the argument 'bigRR' may speed up a lot if p >> n.\n")
 ### Check starting values ###
 if (!is.null(startval)) {
-    if (!is.numeric(startval)) stop("Non-numeric starting value is not allowed")
-    if (length(startval) < ncol(x) + k + nRand[k]) stop("Too few starting values. See hglm documentation")
-    if ((family$family == "gaussian" || family$family=="Gamma") & length(startval) < ncol(x) + nRand[k] + k + 1) stop("Too few starting values. See the documentation of hglm")
+    if (!is.numeric(startval)) stop("Non-numeric starting value is not allowed.")
+    if (length(startval) < ncol(x) + k + sum(nRand)) stop("Too few starting values. See hglm documentation.")
+    if ((family$family == "gaussian" || family$family=="Gamma") & length(startval) < ncol(x) + nRand[k] + k + 1) stop("Too few starting values. See the documentation of hglm.")
     b.hat <- startval[1:ncol(x)]
-    if (length(startval) > (ncol(x) + k + nRand[k])) {
+    if (length(startval) > (ncol(x) + k + sum(nRand))) {
     	init.sig.e <- as.numeric(startval[length(startval)])
     } else {
     	init.sig.e <- 1
     }
-	init.u <- startval[(ncol(x) + 1):(ncol(x) + nRand[k])]
-	init.sig.u <- as.numeric(startval[(ncol(x) + nRand[k] + 1)])
-	if (min(init.sig.e, init.sig.u) < 1e-4) stop("Unacceptable initial value is supplied for the variance parameter")
+	init.u <- startval[(ncol(x) + 1):(ncol(x) + sum(nRand))]
+	init.sig.u <- as.numeric(startval[(ncol(x) + sum(nRand) + 1)])
+	if (min(init.sig.e, init.sig.u) < 1e-4) stop("Unacceptable initial value is supplied for the variance parameter.")
 } else {
-	### Generate default initial values of the fixed effects via a GLM ############
+	### Generate default initial values of the fixed effects via a GLM ###
     g1 <- glm(y ~ x - 1, family = family, weights = weights, offset = off)
     b.hat <- as.numeric(coef(g1))
     init.sig.u <- (init.sig.e <- as.numeric(.6*deviance(g1)/g1$df.residual))*.66
@@ -350,8 +350,11 @@ if (iter < maxit) {
     		}
     	}
 	}
-
-	if (calc.like) val$likelihood <- likelihood(val, y, X, Z)
+	
+	if (calc.like) {
+		z <- as.matrix(z)
+		val$likelihood <- likelihood(val, y, X, z, family = family, fix.disp = disp.fv)
+	}
 	
 ##### Calculate Profile Likelihood ##########
 #  Sigma <- Matrix(diag(tau))

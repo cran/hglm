@@ -11,10 +11,11 @@
 function(...)
 {
 	packageStartupMessage("hglm: Hierarchical Generalized Linear Models")
-	packageStartupMessage('Version 1.2-5 installed')
+	packageStartupMessage('Version 1.2-6 installed')
 	packageStartupMessage('Authors:    Moudud Alam - maa@du.se')
 	packageStartupMessage('            Xia Shen - xia.shen@slu.se')
 	packageStartupMessage('            Lars Ronnegard - lrn@du.se')
 	packageStartupMessage('Maintainer: Lars Ronnegard - lrn@du.se')
 	packageStartupMessage('Use citation("hglm") to know how to cite our work.')
+	packageStartupMessage('Discussion: https://r-forge.r-project.org/forum/?group_id=558')
 }

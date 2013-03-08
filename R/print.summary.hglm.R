@@ -4,7 +4,6 @@
 x$nRand <- cumsum(x$RandC)
 cat("Call: \n")
 print(x$call)
-cat("\n")
 cat('\n----------\n')
 cat("MEAN MODEL\n")
 cat('----------\n')
@@ -52,7 +51,7 @@ cat("\n")
 if (x$Method == "REML"){
     cat("-2*Log(Profile-Likelihood) =", round(-2*x$ProfLogLik, digits), "\n")
 } else {
-    cat("WARNING: h-likelihood estimates through EQL can be biased.\n")
+    cat("NOTE: h-likelihood estimates through EQL can be biased.\n")
 }
 if (!is.null(x$varFix)) {
 	if (is.null(x$SummVC1)) {
@@ -99,9 +98,9 @@ if (!is.null(x$varRanef)) {
 }
 cat("\n")
 if (!is.null(x$likelihood)) {
-	cat("-----------\n")
-	cat("LIKELIHOODS\n")
-	cat("-----------\n")
+	cat("---------------\n")
+	cat("LOG-LIKELIHOODS\n")
+	cat("---------------\n")
 	cat("\n")
 	cat("h-likelihood:", x$likelihood$hlik, "\n")
 	cat("Adjusted profile likelihood", "\n") 

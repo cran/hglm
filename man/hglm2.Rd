@@ -18,7 +18,7 @@ hglm2(meanmodel, data = NULL, family = gaussian(link = identity),
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{meanmodel}{\code{formula}. A two sided formula specifying the fixed and random terms in \code{lme4} convension, e.g. \code{y ~ x1 + (1|id)} indicates \code{y} as response, \code{x1} as the fixed effect and \code{(1|id)} represent a random intercept for each level of \code{id}.}
+  \item{meanmodel}{\code{formula}. A two sided formula specifying the fixed and random terms in \code{lme4} convention, e.g. \code{y ~ x1 + (1|id)} indicates \code{y} as response, \code{x1} as the fixed effect and \code{(1|id)} represent a random intercept for each level of \code{id}.}
   \item{data}{\code{data.frame}. An optional data frame from where the variables in the \code{meanmodel} (and possibly \code{disp}) are to be obtained. It is expected that the data frame does not contain any missing value.}
   \item{family}{\code{family}. The description of the error distribution and link function to be used in the mean part of the model. (See \code{\link{family}} for details of family functions.)}
   \item{rand.family}{\code{family}. The description of the distribution and link function to be used for the random effect.}
@@ -70,6 +70,7 @@ It returns an object of class \code{hglm} consiting of the following values.
   \item{disp.resid}{standardized deviance residuals for the dispersion part of the model.}
   \item{link.disp}{link function for the dispersion part of the model.}
   \item{vcov}{the variance-covariance matrix.}
+  \item{likelihood}{a list of likelihood values for model selection purposes, where \code{$hlik} is the h-likelihood, \code{$pvh} the adjusted profile likelihood profiled over random effects, \code{$pbvh} the adjusted profile likelihood profiled over fixed and random effects, \code{$cAIC} the conditional AIC.}
 }
 \references{
 Ronnegard, Lars, Xia Shen and Moudud Alam (2010). \bold{hglm: A Package for Fitting Hierarchical Generalized Linear Models}. \emph{The R Journal}, \bold{2}(2), 20-28.\cr\cr
@@ -82,18 +83,20 @@ Shen, Xia, Moudud Alam, Freddy Fikse and Lars Ronnegard (2013). \bold{A novel ge
 
 \seealso{ \code{\link{hglm}}}
 \examples{
+require(hglm)
+
 # --------------------- #
 # semiconductor example #
 # --------------------- #
 
 data(semiconductor)
 
-h.gamma.normal <- hglm(fixed = y ~ x1 + x3 + x5 + x6,
-                       random = ~ 1|Device,
-                       family = Gamma(link = log),
-                       disp = ~ x2 + x3, data = semiconductor)
-summary(h.gamma.normal)
-plot(h.gamma.normal, cex = .6, pch = 1,
+m11 <- hglm(fixed = y ~ x1 + x3 + x5 + x6,
+            random = ~ 1|Device,
+            family = Gamma(link = log),
+            disp = ~ x2 + x3, data = semiconductor)
+summary(m11)
+plot(m11, cex = .6, pch = 1,
      cex.axis = 1/.6, cex.lab = 1/.6,
      cex.main = 1/.6, mar = c(3, 4.5, 0, 1.5))
 
@@ -101,13 +104,32 @@ plot(h.gamma.normal, cex = .6, pch = 1,
 # redo it using hglm2 #
 # ------------------- #
 
-m1 <- hglm2(y ~ x1 + x3 + x5 + x6 + (1|Device),
+m12 <- hglm2(y ~ x1 + x3 + x5 + x6 + (1|Device),
+             family = Gamma(link = log),
+             disp = ~ x2 + x3, data = semiconductor)
+summary(m12)
+     
+# -------------------------- #
+# redo it using matrix input #
+# -------------------------- #
+
+attach(semiconductor)
+m13 <- hglm(y = y, X = model.matrix(~ x1 + x3 + x5 + x6),
+            Z = kronecker(diag(16), rep(1, 4)),
+            X.disp = model.matrix(~ x2 + x3), 
+            family = Gamma(link = log))
+summary(m13)
+     
+# --------------------- #
+# verbose & likelihoods #
+# --------------------- #
+     
+m14 <- hglm(fixed = y ~ x1 + x3 + x5 + x6,
+            random = ~ 1|Device,
             family = Gamma(link = log),
-            disp = ~ x2 + x3, data = semiconductor)
-summary(m1)
-plot(m1, cex = .6, pch = 1,
-     cex.axis = 1/.6, cex.lab = 1/.6,
-     cex.main = 1/.6, mar = c(3, 4.5, 0, 1.5))
+            disp = ~ x2 + x3, data = semiconductor,
+            verbose = TRUE, calc.like = TRUE)
+summary(m14)
 
 # --------------------------------------------- #  
 # simulated example with 2 random effects terms #
@@ -126,20 +148,19 @@ u2 <- rnorm(5, 0, sqrt(3))
 y <- 1 + 2*x1 + 3*x2 + Z1\%*\%u1 + Z2\%*\%u2 + rnorm(100, 0, sqrt(exp(x3)))
 dd <- data.frame(x1 = x1, x2 = x2, x3 = x3, z1 = z1, z2 = z2, y = y)
 
-(m2.1 <- hglm(X = cbind(rep(1, 100), x1, x2), y = y, Z = cbind(Z1, Z2), 
+(m21 <- hglm(X = cbind(rep(1, 100), x1, x2), y = y, Z = cbind(Z1, Z2), 
               RandC = c(10, 5)))
-summary(m2.1)
-plot(m2.1)
+summary(m21)
+plot(m21)
 
-(m2.2 <- hglm2(y ~ x1 + x2 + (1|z1) + (1|z2), data = dd, vcovmat = TRUE))
-image(m2.2$vcov)
-summary(m2.2)
-plot(m2.2)
+(m22 <- hglm2(y ~ x1 + x2 + (1|z1) + (1|z2), data = dd, vcovmat = TRUE))
+image(m22$vcov, main = 'Variance-covariance Matrix')
+summary(m22)
+plot(m22)
 
-m3 <- hglm2(y ~ x1 + x2 + (1|z1) + (1|z2), disp = ~ x3, data = dd)
-print (m3)
-summary(m3)
-plot(m3)
+m31 <- hglm2(y ~ x1 + x2 + (1|z1) + (1|z2), disp = ~ x3, data = dd)
+print (m31)
+summary(m31)
+plot(m31)
 }
 }
-

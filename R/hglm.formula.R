@@ -84,7 +84,8 @@ row.names(z) <- NULL
 
 val <- hglm.default(X = X, y = Y, Z = z, family = family, rand.family = rand.family, X.disp = x.disp,
                     link.disp = link.disp, method = method, conv = conv, maxit = maxit, startval = startval,
-                    weights = weights, fix.disp = fix.disp, offset = offset, vcovmat = vcovmat, ...)
+                    weights = weights, fix.disp = fix.disp, offset = offset, sparse = sparse, vcovmat = vcovmat, 
+					calc.like = calc.like, bigRR = bigRR, verbose = verbose, ...)
 val$call <- Call
 
 return(val)

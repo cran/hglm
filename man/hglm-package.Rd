@@ -16,15 +16,15 @@ REML for linear mixed models.
 \tabular{ll}{
 Package: \tab hglm\cr
 Type: \tab Package\cr
-Version: \tab 1.2-5\cr
-Date: \tab 2013-02-25\cr
+Version: \tab 1.2-6\cr
+Date: \tab 2013-03-08\cr
 Discussion: \tab https://r-forge.r-project.org/forum/?group_id=558\cr
 BugReports: \tab https://r-forge.r-project.org/tracker/?group_id=558\cr
 License: \tab GPL\cr
 LazyLoad: \tab yes\cr
 Depends: \tab Matrix, MASS, dglm\cr
 }
-This is version 1.2-5 of the hglm package. 
+This is version 1.2-6 of the hglm package. 
 }
 \author{
 Moudud Alam, Xia Shen, Lars Ronnegard\cr\cr

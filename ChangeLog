@@ -1,3 +1,13 @@
+2013-03-11 15:35 xia
+
+    * Update to version 1.2-6
+    * Fixed verbose and likelihood bugs in hglm.formula
+    * Fixed likelihood bugs for structured residual variance
+    * Fixed likelihood bugs for hglm2()
+    * Fixed bug in user-defined initial values for fitting 
+      multiple random effects terms in hglm2()
+    * More in examples
+
 2013-02-25 00:25 xia
 
     * Update to version 1.2-5
@@ -21,14 +31,14 @@
 
 2013-02-15 13:40  xia
 
-	* Update to version 1.2-3
+    * Update to version 1.2-3
     * Start-up message command renewed
     * Xia's email address updated
 
 2011-07-04 13:25  xia
 
-	* Update to version 1.2-2
-	* Fitting multiple correlated random effects
-	* hglm2() function added for use like lme4-type formula
-	* Sparse matrix technique used
-	* Citation information added
+    * Update to version 1.2-2
+    * Fitting multiple correlated random effects
+    * hglm2() function added for use like lme4-type formula
+    * Sparse matrix technique used
+    * Citation information added
