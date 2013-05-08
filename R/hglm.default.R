@@ -115,7 +115,12 @@ else stop("link.disp must be a valid link for the Gamma family GLM")
 
 ### bigRR? ###
 if (!bigRR) {
-if (family$family == "gaussian" & ncol(z) > nrow(z) & length(RandC) == 1) cat("NOTE: You are fitting a normal model with one random effect term, and the number of effects (p) is greater than the number of observations (n). Turning on the argument 'bigRR' may speed up a lot if p >> n.\n")
+if (rand.family$family == "gaussian" & ncol(z) > nrow(z) + 1 & length(RandC) == 1) {
+	cat("NOTE: You are fitting a model with one normal random effect term,\n",
+		"and the number of effects (p) is greater than the number of\n",
+		"observations (n). Consider turning on the argument 'bigRR' that may\n",
+		"speed up a lot if p >> n.\n")
+}
 ### Check starting values ###
 if (!is.null(startval)) {
     if (!is.numeric(startval)) stop("Non-numeric starting value is not allowed.")

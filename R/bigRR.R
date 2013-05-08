@@ -42,12 +42,18 @@ function (formula = NULL, y, X, Z, data = NULL, shrink = NULL, weight = NULL,
 	wZt <- sqrt(w)*t(Z)
 	G <- crossprod(wZt) #else G <- gpuMatMult(t(wZt), wZt)
 
-############ Bending to allow for p<n problems -- Lars
-    min.eigen <- min(eigen(G, only.values = TRUE)$values)
-    if (min.eigen < tol.err) G <- G + diag(N)*(abs(min.eigen) + tol.err) 
-############
-    invG <- solve(G)
-    L <- t(chol(G))
+	############ Bending to allow for p<n problems -- Lars (Xia added SVD)
+	if (k < n) {
+		eigen.values <- svd(G)$d
+		min.eigen <- min(eigen.values)
+		if (min.eigen < tol.err) G <- G + diag(N)*(abs(min.eigen) + tol.err) 
+	}
+	############
+	#invG <- solve(G)
+	#L <- t(chol(G))
+	svdG <- svd(G)
+	L <- svdG$u %*% diag(sqrt(svdG$d))
+	invG <- tcrossprod(svdG$v %*% diag(1/svdG$d), svdG$u)
     phi0 <- sa0 <- 1
     if (is.null(lambda)) {
         hm <- hglm(y = y, X = X, Z = L, family = family, conv = tol.conv) ## checked with old emme code, conv = 1e-6 removed -- Xia
@@ -70,7 +76,7 @@ function (formula = NULL, y, X, Z, data = NULL, shrink = NULL, weight = NULL,
     if (!only.estimates) {
         C <- rbind(cbind(crossprod(X, X), crossprod(X, L)), cbind(crossprod(L, X), G + diag(N)*phi/sa))
         C22 <- solve(C)[(p + 1):(p + N), (p + 1):(p + N)]*phi
-		transf <- tcrossprod((w*tZinvG), t(L)) #else transf <- gpuMatMult((w*tZinvG), L)
+		transf <- (w*tZinvG) %*% L #else transf <- gpuMatMult((w*tZinvG), L)
         qu <- hat.transf(C22, transf, vc = sa, w, k, N, tol.err = tol.err)
         qu[qu < tol.err] <- tol.err
         qu[qu > (1 - tol.err)] <- 1 - tol.err
