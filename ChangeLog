@@ -1,3 +1,33 @@
+2014-01-01 17:39 xia
+
+    * Update to version 2.0-2
+    * Maintainer changed to Xia Shen
+    * lrt() function added for testing variance
+      components via likelihood-ratio test
+    * New vignette compiled using knitr!
+
+2013-11-21 19:50 xia
+
+    * Update to version 2.0-1
+    * svd() to eigen() decomposition bug fixed
+    * likelihood calculation upgraded
+
+2013-10-20 19:50 xia
+
+    * Update to version 2.0-0
+    * Spatial MRF model implemented in a smart way!
+      CAR() family for random effects added
+    * Different families allowed for multiple random
+      effects terms!
+    * HL(1,1) correction implemented - much better
+      bias correction for binomial & Poisson families! 
+    * Likelihood calculation upgraded
+    * Fixed effects model implemented for the variance
+      component of random effects
+    * Scottish lip cancer dataset included
+    * Link function bug fixed for Gamma-distributed random 
+      effects
+
 2013-05-02 15:45 xia
 
     * Update to version 1.2-8

@@ -47,7 +47,8 @@ smst <- list(Method = Method, FixCoefMat = FixCoefMat, RandCoefMat = RandCoefMat
              nRand = object$nRand, SummVC1 = object$SummVC1, SummVC2 = object$SummVC2, iter = object$iter,
              converge = object$Converge, call = Call, ProfLogLik = object$ProfLogLik, devdf = object$dfReFe,
              LogLik = object$LogLik, varFix = object$varFix, varRanef = object$varRanef, link.disp = object$link.disp,
-			 likelihood = object$likelihood)
+			 likelihood = object$likelihood, call.rand.family = object$call.rand.family, 
+			 CAR.tau = object$CAR.tau, CAR.rho = object$CAR.rho)
   
 class(smst) <- "summary.hglm"
   

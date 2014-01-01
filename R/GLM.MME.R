@@ -1,7 +1,7 @@
 `GLM.MME` <-
 	function(Augy, AugXZ, starting.delta, tau, phi, n.fixed, n.random, off,
-             weights.sqrt, prior.weights, family, rand.family, maxit, sparse = TRUE, tol = 1e-7) {
-
+             weights.sqrt, prior.weights, family, rand.family, maxit, 
+			 sparse = TRUE, tol = 1e-7, colidx, HL.correction = 0) {
 ### Set constants and working variables
 n <- length(Augy)
 p <- ncol(AugXZ)
@@ -19,12 +19,20 @@ if (!is.null(z)) v.hat <- starting.delta[(p - k + 1):p]
 
 ### Calculate working variable z
 if (!is.null(z)) {
-	ui <- rand.family$linkinv(v.hat)
-    eta.i <- as.numeric(x%*%b.hat + z%*%ui) + off
-    mu.i <- family$linkinv(eta.i)
-    dmu_deta <- family$mu.eta(eta.i)
-    zi <- as.numeric(eta.i - off + (y - mu.i)/dmu_deta)
-    du_dv <- rand.family$mu.eta(ui)
+	if (class(rand.family) == 'family') {
+		ui <- rand.family$linkinv(v.hat)
+    	du_dv <- rand.family$mu.eta(ui)
+	} else {
+		ui <- du_dv <- c()
+		for (i in 1:length(rand.family)) {
+			ui <- c(ui, rand.family[[i]]$linkinv(v.hat[colidx[[i]]]))
+			du_dv <- c(du_dv, rand.family[[i]]$mu.eta(ui[colidx[[i]]]))
+		}
+	}
+	eta.i <- as.numeric(x%*%b.hat + z%*%ui) + off
+	mu.i <- family$linkinv(eta.i)
+	dmu_deta <- family$mu.eta(eta.i)
+	zi <- as.numeric(eta.i - off + (y - mu.i)/dmu_deta)
     zmi <- as.numeric(v.hat + (psi - ui)/du_dv)
     Augz <- c(zi, zmi)
 } else {
@@ -48,11 +56,26 @@ while (maxmuit <= maxit){
     	mu.i <- family$linkinv(eta.i)
     	dmu_deta <- family$mu.eta(eta.i)
     	zi <- eta.i - off + (y - mu.i)/dmu_deta
-    	ui <- rand.family$linkinv(v.i)
-    	du_dv <- rand.family$mu.eta(v.i)
-    	zmi <- as.numeric(v.i + (psi - ui)/du_dv)
+    	zi <- zi - HL.correction
+		if (class(rand.family) == 'family') {
+    		ui <- rand.family$linkinv(v.i)
+    		du_dv <- rand.family$mu.eta(v.i)
+		} else {
+			ui <- du_dv <- c()
+			for (i in 1:length(rand.family)) {
+				ui <- c(ui, rand.family[[i]]$linkinv(v.i[colidx[[i]]]))
+				du_dv <- c(du_dv, rand.family[[i]]$mu.eta(v.i[colidx[[i]]]))
+			}
+		}
+		zmi <- as.numeric(v.i + (psi - ui)/du_dv)
     	Augz <- c(zi, zmi)
-    	w <- sqrt(as.numeric(c((dmu_deta^2/family$variance(mu.i))*(1/tau), (du_dv^2/rand.family$variance(ui))*(1/phi)))*prior.weights)
+		if (class(rand.family) == 'family') {
+    		w <- sqrt(as.numeric(c((dmu_deta^2/family$variance(mu.i))*(1/tau), (du_dv^2/rand.family$variance(ui))*(1/phi)))*prior.weights)
+		} else {
+			w <- as.numeric((dmu_deta^2/family$variance(mu.i))*(1/tau))
+			for (i in 1:length(rand.family)) w <- c(w, as.numeric((du_dv[colidx[[i]]]^2/rand.family[[i]]$variance(ui[colidx[[i]]]))*(1/phi[colidx[[i]]])))	
+			w <- sqrt(w*prior.weights)
+		}
     } else {
     	eta.i <- as.numeric(x%*%est[1:(p - k)]) + off
     	mu.i <- family$linkinv(eta.i)
@@ -71,7 +94,12 @@ hv <- rowSums(qr.qy(SQR, diag(1, nrow = n, ncol = p))^2)
 
 ### Calculate deviances
 if (!is.null(z)) { 
-	dev <- c(as.numeric(family$dev.resids(y[1:nk], mu.i, prior.weights[1:nk])), as.numeric(rand.family$dev.resids(psi, ui, rep(1, k))))
+	if (class(rand.family) == 'family') {
+		dev <- c(as.numeric(family$dev.resids(y[1:nk], mu.i, prior.weights[1:nk])), as.numeric(rand.family$dev.resids(psi, ui, rep(1, k))))
+	} else {
+		dev <- as.numeric(family$dev.resids(y[1:nk], mu.i, prior.weights[1:nk]))
+		for (i in 1:length(rand.family)) dev <- c(dev, as.numeric(rand.family[[i]]$dev.resids(psi[colidx[[i]]], ui[colidx[[i]]], 1)))	
+	}
 } else {
     dev <- c(as.numeric(family$dev.resids(y[1:nk], mu.i, prior.weights[1:nk])))
 }

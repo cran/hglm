@@ -61,14 +61,25 @@ if (length(x$RandC) == 1) {
 if (!is.null(x$varFix)) {
 	cat("Dispersion parameter for the mean model:", x$varFix, '\n')
 } else {
-	cat("---------------------------------")
-	cat("\nEstimates of the dispersion model\n")
-	cat("---------------------------------\n")
-	cat("\nLink =", x$link.disp, "\n")
+	cat("------------------------------------------")
+	cat("\nEstimates of the residual dispersion model\n")
+	cat("------------------------------------------\n")
+	cat("\nLink =", x$link.rand.disp, "\n")
 	cat("\nEffects:\n")
 	print(x$SummVC1[,1])
 }
-cat("\nDispersion parameter for the random effects:", x$varRanef, '\n')
+if (!is.null(x$varRanef)) {
+	cat("\nDispersion parameter for the random effects:", x$varRanef, '\n')
+} else {
+	cat("\n------------------------------------------------")
+	cat("\nEstimates of the random effects dispersion model\n")
+	cat("------------------------------------------------\n")
+	cat("\nLink =", x$link.rand.disp, "\n")
+	cat("\nEffects:\n")
+	for (i in 1:length(x$SummVC2)) {
+		print(x$SummVC2[[i]][,1])
+	}
+}
 cat(paste("\nEstimation", x$Converge, "in", x$iter, "iterations\n"))
 
 }

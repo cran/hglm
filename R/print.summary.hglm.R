@@ -24,7 +24,7 @@ if (!is.null(x$RandCoefMat)) {
 		} else {
 			print(round(x$RandCoefMat[1:3,], digits))
 			cat('...\n')
-			cat('NOTE: to show all the random effects estimates, use print(summary(hglm.object), print.ranef = TRUE).\n')
+			cat('NOTE: to show all the random effects, use print(summary(hglm.object), print.ranef = TRUE).\n')
 		}
 	} else {
 		for (J in 1:length(x$RandC)) {
@@ -38,7 +38,7 @@ if (!is.null(x$RandCoefMat)) {
 			} else {
 				print(round(x$RandCoefMat[[J]][1:3,], digits))
 				cat('...\n')
-				cat('NOTE: to show all the random effects estimates, use print(summary(hglm.object), print.ranef = TRUE).\n')
+				cat('NOTE: to show all the random effects, use print(summary(hglm.object), print.ranef = TRUE).\n')
 			}
 		}
 	}
@@ -83,14 +83,32 @@ if (!is.null(x$varRanef)) {
 	if (length(x$RandC) == 1) {
 		cat("\nEffects:\n")
 		cat(names(x$SummVC2), '\n')
-		print(round(x$SummVC2[[1]], digits))
+		if (is.null(x$CAR.tau)) {
+			print(round(x$SummVC2[[1]], digits)) 
+		} else {
+			rownames(x$SummVC2[[1]]) <- c('1/CAR.tau', '-CAR.rho/CAR.tau')
+			print(round(x$SummVC2[[1]], digits))
+			cat('CAR.tau (estimated spatial variance component):', x$CAR.tau, '\n')
+			cat('CAR.rho (estimated spatial correlation):', x$CAR.rho, '\n')
+		}
 		cat("\n")
 	} else {
 		ranefnames <- names(x$SummVC2)
 		cat("\nEffects:\n")
 		for (J in 1:length(x$RandC)) {
 			cat(ranefnames[J], '\n')
-			print(round(x$SummVC2[[J]], digits))
+			if (is.null(x$CAR.tau)) {
+				print(round(x$SummVC2[[J]], digits)) 
+			} else {
+				if (x$call.rand.family[[J]]$family == 'CAR') {
+					rownames(x$SummVC2[[J]]) <- c('1/CAR.tau', '-CAR.rho/CAR.tau')
+					print(round(x$SummVC2[[J]], digits))
+					cat('CAR.tau (estimated spatial variance component):', x$CAR.tau, '\n')
+					cat('CAR.rho (estimated spatial correlation):', x$CAR.rho, '\n')
+				} else {
+					print(round(x$SummVC2[[J]], digits)) 
+				}
+			}
 			cat("\n")
 		}
 	}

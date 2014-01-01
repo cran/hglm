@@ -7,7 +7,8 @@
  Plots residuals for the mean and dispersion models, individual deviances and hatvalues for \code{hglm} objects
 }
 \usage{
-\method{plot}{hglm}(x, pch = "+", pcol = 4, lcol = 2, ...)
+\method{plot}{hglm}(x, pch = "+", pcol = 'slateblue', lcol = 2, 
+                    device = NULL, name = NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -15,6 +16,8 @@
   \item{pch}{symbol used in the plots}
   \item{pcol}{color of points}
   \item{lcol}{color of lines}
+  \item{device}{if \code{NULL}, plot on screen devices, if \code{'pdf'}, plot to PDF files in the current working directory.}
+  \item{name}{a string gives the main name of the PDF file when \code{device = 'pdf'}.}
   \item{\dots}{graphical parameters}
 }
 \details{

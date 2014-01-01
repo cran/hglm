@@ -9,7 +9,6 @@
 Call <- match.call(expand.dots = FALSE)
 
 ### check the formulae ###
-require(Matrix)
 if (!inherits(meanmodel, "formula") || length(meanmodel) < 3) stop("\n Mean model must be a formula of the form \"response ~ fixd + (random)\"")
 MainResponse <- all.vars(meanmodel)[1]
 MainTerms <- terms(meanmodel)

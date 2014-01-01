@@ -1,5 +1,5 @@
 `plot.hglm` <-
-	function(x, pch = "+", pcol = 4, lcol = 2, ...) {
+	function(x, pch = "+", pcol = 'slateblue', lcol = 2, device = NULL, name = NULL, ...) {
 	
 	residuals <- x$resid
 	fitted.values <- x$fv
@@ -13,9 +13,10 @@
 	if (is.null(nrow(x$SummVC1))) idx <- c(1, 3, 4) else idx <- 1:4
 	for (i in idx) {
 		if (i > 1) {
-			dev.new()
+			if (is.null(device)) dev.new() 
 		}
 		if (i == 1) {
+			if (!is.null(device)) pdf(paste(name, i, '.pdf', sep = ''), width = 10, height = 10)
 			par(mfrow = c(2, 2), pty = "s", ...)
 			loess.fit <- loess.smooth(fitted.values, residuals)
 			plot(fitted.values, residuals, xlab = "Fitted Values", 
@@ -29,9 +30,11 @@
 				   xlab = "Normal Quantiles", ylab = "Residual Quantiles", main = "Mean Model (c)")
 			qqline(residuals, col = lcol)
 			hist(residuals, density = 15, xlab = "Studentized Residuals", main = "Mean Model (d)", col = pcol)
+			if (!is.null(device)) dev.off()
 		}
 		else {
 			if (i == 2) {
+				if (!is.null(device)) pdf(paste(name, i, '.pdf', sep = ''), width = 10, height = 10)
 				par(mfrow = c(2, 2), pty = "s", ...)
 				loess.fit <- loess.smooth(disp.fitted.values, disp.residuals)
 				plot(disp.fitted.values, disp.residuals, xlab = "Fitted Values", 
@@ -45,13 +48,17 @@
 					   xlab = "Normal Quantiles", ylab = "Residual Quantiles", main = "Dispersion Model (c)")
 				qqline(disp.residuals, col = lcol)
 				hist(disp.residuals, density = 15, xlab = "Standardized Deviance Residuals", main = "Dispersion Model (d)", col = pcol)
+				if (!is.null(device)) dev.off()
 			}
 			else {
 				if (i == 3) {
+					if (!is.null(device)) pdf(paste(name, i, '.pdf', sep = ''), width = 10, height = 5)
 					par(mfrow = c(1, 2), pty = "s", ...)
 					plot(hatvalues, ylab = "Hat-values", main = "Hat-values", pch = pch, col = pcol, bty = "n")
 					plot(deviances, ylab = "Deviances", main = "Deviances", pch = pch, col = pcol, bty = "n")
+					if (!is.null(device)) dev.off()
 				} else {
+					if (!is.null(device)) pdf(paste(name, i, '.pdf', sep = ''), width = 10, height = (length(x$RandC) + 1)*5)
 					par(mfrow = c(length(x$RandC) + 1, 2))
 					devid <- 1:(length(deviances) - max(x$nRand))
 					beta <- var(deviances[devid])/mean(deviances[devid])
@@ -96,6 +103,7 @@
 							hist(deviances[devid], density = 15, xlab = "Deviances", main = paste(names(x$SummVC2)[J], "Deviances"), col = pcol)
 						}
 					}
+					if (!is.null(device)) dev.off()
 				}
 			}
 		}

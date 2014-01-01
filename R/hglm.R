@@ -1,11 +1,10 @@
 `hglm` <-
-	function(X = NULL, y = NULL, Z = NULL, family = gaussian(link=identity),
-	         rand.family = gaussian(link = identity), method = "EQL", 
-	         conv = 1e-6, maxit = 50, startval = NULL,
-	         fixed = NULL, random = NULL, X.disp = NULL, disp = NULL, 
-	         link.disp = "log", data = NULL, weights = NULL, fix.disp = NULL, 
-	         offset = NULL, RandC = NULL, sparse = TRUE, vcovmat = FALSE, calc.like = FALSE, 
-			 bigRR = FALSE, verbose = FALSE, ...) UseMethod("hglm")
+		function(X = NULL, y = NULL, Z = NULL, family = gaussian(link = identity),
+				rand.family = gaussian(link = identity), method = "EQL", conv = 1e-6, maxit = 50, 
+				startval = NULL, fixed = NULL, random = NULL, X.disp = NULL, disp = NULL, 
+				link.disp = "log", X.rand.disp = NULL, rand.disp = NULL, link.rand.disp = "log", 
+				data = NULL, weights = NULL, fix.disp = NULL, offset = NULL, RandC = ncol(Z), 
+				sparse = TRUE, vcovmat = FALSE, calc.like = FALSE, bigRR = FALSE, verbose = FALSE, ...) UseMethod("hglm")
 
 .onAttach <- 
 		function(lib, pkg, ...)
@@ -32,8 +31,10 @@
 						"to update the package.\n", sep = ""))
 		}
 	}
-	packageStartupMessage('Use citation("hglm") to know how to cite our work.')
-	packageStartupMessage('Discussion: https://r-forge.r-project.org/forum/?group_id=558\n')
+	packageStartupMessage('Use citation("hglm") to know how to cite our work.\n')
+	packageStartupMessage('Discussion: https://r-forge.r-project.org/forum/?group_id=558')
+	packageStartupMessage('BugReports: https://r-forge.r-project.org/tracker/?group_id=558')
+	packageStartupMessage('VideoTutorials: http://www.youtube.com/playlist?list=PLn1OmZECD-n15vnYzvJDy5GxjNpVV5Jr8')
 	
 	options(warn = -1)
 	

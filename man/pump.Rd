@@ -5,7 +5,7 @@
 \description{
 The \sQuote{pump} data set presents the failures of pumps in several systems of the water reactor neuclear plant Farley 1. 
 }
-\format{ The \sQuote{pump} data set contans 4 columns and 10 rows. A short description of the data columns are given below. 
+\format{ The \sQuote{pump} data set contains 4 columns and 10 rows. A short description of the data columns are given below. 
  \describe{
  \item{System}{The system number.}
  \item{S}{Number of pumps failures.}

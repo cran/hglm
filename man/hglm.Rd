@@ -10,12 +10,13 @@
 }
 \usage{
 hglm(X = NULL, y = NULL, Z = NULL, family = gaussian(link = identity),
-     rand.family = gaussian(link = identity), method = "EQL",
-     conv = 1e-6, maxit = 50, startval = NULL, fixed = NULL, random = NULL,
-     X.disp = NULL, disp = NULL, link.disp = "log", data = NULL, 
-     weights = NULL, fix.disp=NULL, offset = NULL, 
-     RandC = NULL, sparse = TRUE, vcovmat = FALSE, calc.like = FALSE, 
-     bigRR = FALSE, verbose = FALSE, ...)
+     rand.family = gaussian(link = identity), method = "EQL", 
+     conv = 1e-6, maxit = 50, startval = NULL, fixed = NULL, 
+     random = NULL, X.disp = NULL, disp = NULL, link.disp = "log", 
+     X.rand.disp = NULL, rand.disp = NULL, link.rand.disp = "log", 
+     data = NULL, weights = NULL, fix.disp = NULL, offset = NULL, 
+     RandC = ncol(Z), sparse = TRUE, vcovmat = FALSE, 
+     calc.like = FALSE, bigRR = FALSE, verbose = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -24,15 +25,18 @@ hglm(X = NULL, y = NULL, Z = NULL, family = gaussian(link = identity),
   \item{Z}{\code{matrix}. The design matrix for the random effects.}
   \item{family}{\code{family}. The description of the error distribution and link function to be used in the mean part of the model. (See \code{\link{family}} for details of family functions.)}
   \item{rand.family}{\code{family}. The description of the distribution and link function to be used for the random effect.}
-  \item{method}{\code{character}. Estimation method where \code{EQL} is the method of interconnected GLMs presented in Lee et al (2006). Currently only \code{EQL} is available as the estimation method.}
+  \item{method}{\code{character}. Estimation method where \code{EQL} is the method of interconnected GLMs presented in Lee et al (2006). Apart from the default option \code{EQL} there is also a \code{HL11} option, which improves estimation for GLMMs (especially for Poisson models with a large number of levels in the random effects).}
   \item{conv}{\code{numeric}. The convergence criteria (change in linear predictor between iterations).}
   \item{maxit}{\code{numeric}. Maximum number of iterations in the \code{hglm} algorithm.}
   \item{startval}{\code{numeric}. A vector of starting values in the following order: fixed effects, random effect, variance of random effects, variance of residuals.}
   \item{fixed}{\code{formula}. A \code{\link{formula}} specifying the fixed effects part of the model.}
   \item{random}{\code{formula}. A one-sided \code{\link{formula}} specifying the random effects part of the model.}
-  \item{X.disp}{\code{matrix}. The design matrix for the fixed effects in the dispersion part of the model.}
-  \item{disp}{\code{formula}. A one-sided \code{\link{formula}} specifying the fixed effects in the dispersion part of the model.}
-  \item{link.disp}{\code{character}. The link function for the dispersion part of the model.}
+  \item{X.disp}{\code{matrix}. The design matrix for the fixed effects in the residual dispersion part of the model.}
+  \item{disp}{\code{formula}. A one-sided \code{\link{formula}} specifying the fixed effects in the residual dispersion part of the model.}
+  \item{link.disp}{\code{character}. The link function for the residual dispersion part of the model.}
+  \item{X.rand.disp}{\code{matrix}. The design matrix for the fixed effects in the random effects dispersion part of the model.}
+  \item{rand.disp}{\code{formula}. A one-sided \code{\link{formula}} specifying the fixed effects in the random effects dispersion part of the model.}
+  \item{link.rand.disp}{\code{character}. The link function for the random effects dispersion part of the model.}
   \item{data}{\code{data.frame}. The data frame to be used together with \code{fixed} and \code{random}.}
   \item{weights}{\code{numeric}. Prior weights to be specified in weighted regression.}
   \item{fix.disp}{\code{numeric}. A numeric value if the dispersion parameter of the mean model is known, e.g., 1 for binomial and Poisson model.}
@@ -61,6 +65,8 @@ It returns an object of class \code{hglm} consiting of the following values.
   \item{RandC}{integers (possibly a vector) specified the number of column of Z to be used for each of the random-effect terms.}
   \item{varFix}{dispersion parameter of the mean model (residual variance for LMM).}
   \item{varRanef}{dispersion parameter of the random effects (variance of random effects for GLMM).}
+  \item{CAR.rho}{parameter estimate for a MRF spatial model.}
+  \item{CAR.tau}{parameter estimate for a MRF spatial model.}
   \item{iter}{number of iterations used.}
   \item{Converge}{specifies if the algorithm converged.}
   \item{SeFe}{standard errors of fixed effects.}
@@ -79,16 +85,21 @@ It returns an object of class \code{hglm} consiting of the following values.
   \item{likelihood}{a list of likelihood values for model selection purposes, where \code{$hlik} is the h-likelihood, \code{$pvh} the adjusted profile likelihood profiled over random effects, \code{$pbvh} the adjusted profile likelihood profiled over fixed and random effects, \code{$cAIC} the conditional AIC.}
 }
 \references{
-Ronnegard, Lars, Xia Shen and Moudud Alam (2010). \bold{hglm: A Package for Fitting Hierarchical Generalized Linear Models}. \emph{The R Journal}, \bold{2}(2), 20-28.\cr\cr
+Lars Ronnegard, Xia Shen and Moudud Alam (2010). \bold{hglm: A Package for Fitting Hierarchical Generalized Linear Models}. \emph{The R Journal}, \bold{2}(2), 20-28.\cr\cr
 
-Lee, Youngjo, John A Nelder and Yudi Pawitan (2006) \emph{Generalized Linear Models with Random Effect: a unified analysis via h-likelihood.} Chapman and Hall/CRC.\cr\cr
+Youngjo Lee, John A Nelder and Yudi Pawitan (2006) \emph{Generalized Linear Models with Random Effect: a unified analysis via h-likelihood.} Chapman and Hall/CRC.\cr\cr
 
-Shen, Xia, Moudud Alam, Freddy Fikse and Lars Ronnegard (2013). \bold{A novel generalized ridge regression method for quantitative genetics}. \emph{Genetics}.
+Xia Shen, Moudud Alam, Freddy Fikse and Lars Ronnegard (2013). \bold{A novel generalized ridge regression method for quantitative genetics}. \emph{Genetics}.\cr\cr
+
+Moudud Alam, Lars Ronnegard, Xia Shen (2014). \bold{Fitting spatial models in hglm}. \emph{Submitted}.
 }
 \author{Moudud Alam, Lars Ronnegard, Xia Shen}
 
 \seealso{\code{\link{hglm2}}}
 \examples{
+# Find more examples and instructions in the package vignette:
+# vignette('hglm')
+
 require(hglm)
 
 # --------------------- #
@@ -155,9 +166,13 @@ y <- 1 + 2*x1 + 3*x2 + Z1\%*\%u1 + Z2\%*\%u2 + rnorm(100, 0, sqrt(exp(x3)))
 dd <- data.frame(x1 = x1, x2 = x2, x3 = x3, z1 = z1, z2 = z2, y = y)
 
 (m21 <- hglm(X = cbind(rep(1, 100), x1, x2), y = y, Z = cbind(Z1, Z2), 
-              RandC = c(10, 5)))
+             RandC = c(10, 5)))
 summary(m21)
 plot(m21)
+
+# m21 is the same as:
+(m21b <- hglm(X = cbind(rep(1, 100), x1, x2), y = y, Z = cbind(Z1, Z2), 
+              rand.family = list(gaussian(), gaussian()), RandC = c(10, 5))
 
 (m22 <- hglm2(y ~ x1 + x2 + (1|z1) + (1|z2), data = dd, vcovmat = TRUE))
 image(m22$vcov, main = 'Variance-covariance Matrix')
@@ -168,6 +183,17 @@ m31 <- hglm2(y ~ x1 + x2 + (1|z1) + (1|z2), disp = ~ x3, data = dd)
 print (m31)
 summary(m31)
 plot(m31)
+
+# ------------------------------- #  
+# Markov random field (MRF) model #
+# ------------------------------- #  
+data(cancer)
+logE <- log(E)
+X11 <- model.matrix(~Paff)
+m41 <- hglm(X = X11, y = O, Z = diag(length(O)), 
+           family = poisson(), rand.family = CAR(D = nbr),
+           offset = logE, conv = 1e-9, maxit = 200, fix.disp = 1)
+summary(m41)
 }
 }
 
