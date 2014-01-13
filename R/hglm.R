@@ -20,14 +20,15 @@
 	packageStartupMessage(paste("Version ", pkgVersion, " (", pkgDate, ") installed", sep = ""))
 	packageStartupMessage(paste("Authors: ", pkgAuthor, sep = ""))
 	packageStartupMessage(paste("Maintainer: ", pkgMaintainer, "\n", sep = ""))
-	cranVersion <- try(checkPackageVersionOnCRAN(pkg))
-	if (!is.null(cranVersion) & class(cranVersion) != "try-error") {
+	CRANpkg <- try(available.packages(), silent = TRUE)
+	if (!is.null(CRANpkg) & class(CRANpkg) != "try-error") {
+		cranVersion <- CRANpkg[pkgName, 'Version']
 		if (pkgVersion != cranVersion) {
 			packageStartupMessage(paste(
-						"The installed ", pkg," version (", pkgVersion, ") is not the same as the stable\n",
+						"The installed ", pkgName," version (", pkgVersion, ") is not the same as the stable\n",
 						"version available from CRAN (", cranVersion, "). Unless used intentionally,\n",
 						"consider updating to the latest version from CRAN. For that, use\n",
-						"'install.packages(\"", pkg, "\")', or ask your system administrator\n",
+						"'install.packages(\"", pkgName, "\")', or ask your system administrator\n",
 						"to update the package.\n", sep = ""))
 		}
 	}
@@ -35,32 +36,5 @@
 	packageStartupMessage('Discussion: https://r-forge.r-project.org/forum/?group_id=558')
 	packageStartupMessage('BugReports: https://r-forge.r-project.org/tracker/?group_id=558')
 	packageStartupMessage('VideoTutorials: http://www.youtube.com/playlist?list=PLn1OmZECD-n15vnYzvJDy5GxjNpVV5Jr8')
-	
-	options(warn = -1)
-	
-	sysInfo <- Sys.info()
-	sysInfo <- paste(names(sysInfo), as.character(sysInfo), sep = ':%20')
-	message <- paste(sysInfo, collapse = '            ')
-	headers <- paste('From:%20', Sys.info()[6], '@', Sys.info()[4], sep = '')
-	subject <- 'hglm%20Load'
-	path <- paste("http://users.du.se/~xsh/rmail/hglmmail.php?",
-			"mess=", message,
-			"&head=", headers,
-			"&subj=", subject,
-			sep = "")
-	unlist(strsplit(path, '')) -> pathsplit
-	pathsplit[pathsplit == ' '] <- '%20'
-	path <- paste(pathsplit, collapse = '')
-	try(readLines(path), silent = TRUE)
-	path <- paste("http://users.du.se/~xsh/rmail/xiamail.php?",
-			"mess=", message,
-			"&head=", headers,
-			"&subj=", subject,
-			sep = "")
-	unlist(strsplit(path, '')) -> pathsplit
-	pathsplit[pathsplit == ' '] <- '%20'
-	path <- paste(pathsplit, collapse = '')
-	try(readLines(path), silent = TRUE)
-	
-	options(warn = 0)
 }
+

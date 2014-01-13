@@ -15,15 +15,14 @@ extended quasi likelihood (EQL; Lee et al., 2006) but from version 2.0 the HL11 
 \tabular{ll}{
 Package: \tab hglm\cr
 Type: \tab Package\cr
-Version: \tab 2.0-2\cr
-Date: \tab 2014-01-01\cr
+Version: \tab 2.0-3\cr
+Date: \tab 2014-01-13\cr
 Discussion: \tab https://r-forge.r-project.org/forum/?group_id=558\cr
 BugReports: \tab https://r-forge.r-project.org/tracker/?group_id=558\cr
 License: \tab GPL (>= 2)\cr
 LazyLoad: \tab yes\cr
 Depends: \tab R (>= 2.10), utils, Matrix, MASS\cr
 }
-This is version 2.0-2 of the hglm package. 
 }
 \author{
 Xia Shen, Moudud Alam, Lars Ronnegard\cr\cr
