@@ -1,3 +1,9 @@
+2014-01-20 12:45 xia
+
+    * Update to version 2.0-4
+    * CAR family random effects calculation bug fixed
+    * lrt() function p-value bug fixed
+
 2014-01-13 12:45 xia
 
     * Update to version 2.0-3

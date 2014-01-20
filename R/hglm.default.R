@@ -50,40 +50,6 @@ if (is.null(offset)) {
 }
 ### Data consistency checked ###
 
-GAMMA <- function (link = "log") { ### Modified Gamma() function ###
-	linktemp <- substitute(link)
-    if (!is.character(linktemp)) {
-        linktemp <- deparse(linktemp)
-        if (linktemp == "link") {
-            warning("use of GAMMA(link=link) is deprecated\n", domain = NA)
-            linktemp <- eval(link)
-            if (!is.character(linktemp) || length(linktemp) != 1)
-                stop("'link' is invalid", domain = NA)
-        }
-    }
-    okLinks <- c("inverse", "log", "identity")
-    if (linktemp %in% okLinks)
-        stats <- make.link(linktemp)
-    else if (is.character(link))
-        stats <- make.link(link)
-    else {
-        if (inherits(link, "link-glm")) {
-            stats <- link
-            if (!is.null(stats$name))
-                linktemp <- stats$name
-        }
-        else {
-            stop(gettextf("link \"%s\" not available for gamma family; available links are %s",
-                 linktemp, paste(sQuote(okLinks), collapse = ", ")), domain = NA)
-        }
-    }
-    variance <- function(mu) mu ### Note this variance function
-    validmu <- function(mu) all(mu > 0)
-    dev.resids <- function(y, mu, wt) -2 * wt * (log(mu) + (1 - mu))
-    structure(list(family = "GAMMA", link = linktemp, linkfun = stats$linkfun,
-			  linkinv = stats$linkinv, variance = variance, dev.resids = dev.resids, 
-			  mu.eta = stats$mu.eta), class = "family")
-}
 
 ### Check consistency of GLM family and number of random effects terms
 if (class(rand.family) != 'family' & length(rand.family) != length(RandC)) stop('Number of given families and number of random effects terms differ.')
@@ -433,10 +399,10 @@ if (!is.null(z)) names(ui) <- z.names
 fixef <- b.hat                        
 if (!is.null(z)) ranef <- ui else ranef <- phi <- NULL
 if (class(rand.family) == 'family') {
-	if (rand.family$family == 'CAR') ranef <- crossprod(rand.family$Dvec, ranef)
+	if (rand.family$family == 'CAR') ranef <- rand.family$Dvec %*% ranef ## ranef for CAR calculation bug fixed by Lars 2014-01-20
 } else {
 	for (i in 1:k) {
-		if (rand.family[[i]]$family == 'CAR') ranef[colidx[[i]]] <- crossprod(rand.family[[i]]$Dvec, ranef[colidx[[i]]])
+		if (rand.family[[i]]$family == 'CAR') ranef[colidx[[i]]] <- rand.family[[i]]$Dvec %*% ranef[colidx[[i]]] ## ranef for CAR calculation bug fixed by Lars 2014-01-20
 	}
 }
 
