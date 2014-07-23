@@ -1,4 +1,4 @@
-import("Matrix", "MASS")
+import("Matrix", "MASS", "hglm.data")
 export("hglm", "hglm2", "Beta", "CAR", "lrt")
 
 S3method(hglm, default)

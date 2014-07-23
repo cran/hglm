@@ -194,6 +194,20 @@ m41 <- hglm(X = X11, y = O, Z = diag(length(O)),
            family = poisson(), rand.family = CAR(D = nbr),
            offset = logE, conv = 1e-9, maxit = 200, fix.disp = 1)
 summary(m41)
+
+data(ohio)
+m42 <- hglm(fixed = MedianScore ~ 1, 
+            random = ~ 1 | district, 
+            rand.family = CAR(D = ohioDistrictDistMat), 
+            data = ohioMedian)
+summary(m42)
+require(sp)
+districtShape <- as.numeric(substr(as.character(ohioShape@data$UNSDIDFP), 3, 7)) 
+CARfit <- matrix(m42$ranef + m42$fixef, dimnames = list(rownames(ohioDistrictDistMat), NULL))
+ohioShape@data$CAR <- CARfit[as.character(districtShape),]
+ohioShape@data$CAR[353] <- NA # remove estimate of Lake Erie
+spplot(ohioShape, zcol = "CAR", main = "Fitted values from CAR", 
+        col.regions = heat.colors(1000)[1000:1], cuts = 1000)
 }
 }
 

@@ -10,7 +10,7 @@
 
 \begin{document}
 
-\includepdf[pages={1-36}, fitpaper=true]{hglm-knitr.pdf}
+\includepdf[pages={1-41}, fitpaper=true]{hglm-knitr-knitr.pdf}
 
 \end{document}
 
