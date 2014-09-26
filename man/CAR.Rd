@@ -19,5 +19,5 @@ CAR(D, link = "identity", link.rand.disp = "inverse")
   Output specific for \code{hglm} fit, including eigen values and vectors of \bold{D}.
 }
 \references{
-Moudud Alam, Lars Ronnegard, Xia Shen (2014). \bold{Fitting spatial models in hglm}. \emph{Submitted}.
+Moudud Alam, Lars Ronnegard, Xia Shen (2014). \bold{Spatial modeling in hglm}. \emph{Submitted}.
 }

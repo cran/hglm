@@ -1,3 +1,10 @@
+2014-09-26 22:53 xia
+
+    * Update to version 2.0-9
+    * cAIC bug fixed in the likelihood calculation
+    * Maintainer address updated to
+      xia (dot) shen (at) ki (dot) se
+
 2014-07-23 10:20 xia
 
     * Update to version 2.0-8

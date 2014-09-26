@@ -20,7 +20,8 @@
 	d <- hglm.obj$dev[1:n]
 	cond.lik <- const + sum(d/glm.phi + log(glm.phi/weights))
 
-	p <- hglm.obj$dfReFe
+	#p <- hglm.obj$dfReFe -- bug corrected as below by moudud 2014-09-26
+	p <- sum(hglm.obj$hv[1:n])
 	cAIC <- cond.lik + 2*p
 	v <- hglm.obj$ranef
 	W1 <- diag(1/hglm.obj$disp.fv)

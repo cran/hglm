@@ -82,7 +82,7 @@ It returns an object of class \code{hglm} consiting of the following values.
   \item{disp.resid}{standardized deviance residuals for the dispersion part of the model.}
   \item{link.disp}{link function for the dispersion part of the model.}
   \item{vcov}{the variance-covariance matrix.}
-  \item{likelihood}{a list of likelihood values for model selection purposes, where \code{$hlik} is the h-likelihood, \code{$pvh} the adjusted profile likelihood profiled over random effects, \code{$pbvh} the adjusted profile likelihood profiled over fixed and random effects, \code{$cAIC} the conditional AIC.}
+  \item{likelihood}{a list of log-likelihood values for model selection purposes, where \code{$hlik} is -2 times the log-h-likelihood, \code{$pvh} -2 times the adjusted profile log-likelihood profiled over random effects, \code{$pbvh} -2 times the adjusted profile log-likelihood profiled over fixed and random effects, and \code{$cAIC} the conditional AIC.}
 }
 \references{
 Lars Ronnegard, Xia Shen and Moudud Alam (2010). \bold{hglm: A Package for Fitting Hierarchical Generalized Linear Models}. \emph{The R Journal}, \bold{2}(2), 20-28.\cr\cr
@@ -91,7 +91,7 @@ Youngjo Lee, John A Nelder and Yudi Pawitan (2006) \emph{Generalized Linear Mode
 
 Xia Shen, Moudud Alam, Freddy Fikse and Lars Ronnegard (2013). \bold{A novel generalized ridge regression method for quantitative genetics}. \emph{Genetics}.\cr\cr
 
-Moudud Alam, Lars Ronnegard, Xia Shen (2014). \bold{Fitting spatial models in hglm}. \emph{Submitted}.
+Moudud Alam, Lars Ronnegard, Xia Shen (2014). \bold{Spatial modeling in hglm}. \emph{Submitted}.
 }
 \author{Moudud Alam, Lars Ronnegard, Xia Shen}
 
