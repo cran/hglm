@@ -19,3 +19,22 @@ citEntry(entry="Article",
                "URL http://journal.r-project.org/archive/2010-2/RJournal_2010-2_Roennegaard~et~al.pdf.")
 )
 
+citEntry(entry="Article",
+         title = "Fitting Conditional and Simultaneous Autoregressive Spatial Models in hglm",
+         author = personList(as.person("Moudud Alam"),
+                             as.person("Lars Ronnegard"),
+                             as.person("Xia Shen")),
+         journal      = "Submitted",
+         year         = "2014",
+         volume       = "0",
+         number       = "0",
+         pages        = "0-0",
+         url          = "",
+         
+         textVersion = 
+         paste("Moudud Alam, Lars Ronnegard and Xia Shen (2014)", 
+               "Fitting Conditional and Simultaneous Autoregressive Spatial Models in hglm.",
+               "Submitted, 0(0): 0-0.",
+               "URL .")
+)
+

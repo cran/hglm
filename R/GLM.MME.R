@@ -84,11 +84,12 @@ while (maxmuit <= maxit){
     	Augz <- zi
     	w <- sqrt(as.numeric(c((dmu_deta^2/family$variance(mu.i))*(1/tau))*prior.weights))
     }
+	if (all(is.na(eta.i))) stop('GLM.MME diverged! Try different starting values.')
     if (sum((eta0 - eta.i)^2) < tol*sum(eta.i^2)) break
     eta0 <- eta.i                                                           
     maxmuit <- maxmuit + 1
 }
-if (maxmuit > maxit) message(paste("GLM.MME did not converge in", maxit, ":th iteration"))
+if (maxmuit > maxit) message(paste("GLM.MME did not converge in ", maxit, ":th iteration", sep = ''))
 #qrs <- structure(fit[c("qr", "qraux", "pivot", "tol", "rank")],class="qr")
 hv <- rowSums(qr.qy(SQR, diag(1, nrow = n, ncol = p))^2)
 

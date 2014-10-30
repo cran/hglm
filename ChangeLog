@@ -1,3 +1,18 @@
+2014-10-30 16:24 xia
+
+    * Update to version 2.0-11
+    * Vignette compressed via qpdf
+
+2014-10-23 11:39 xia
+
+    * Update to version 2.0-10
+    * SAR() family for the random effects added
+    * method = 'HL11' changed to method = 'EQL1'
+    * Convergence issues fixed for internal
+      Gamma GLM with inverse link
+    * Bug fixed for g1 when starting values are
+      provided
+
 2014-09-26 22:53 xia
 
     * Update to version 2.0-9

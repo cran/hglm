@@ -13,6 +13,9 @@ x <- as.matrix(X)
 y <- as.vector(y)
 if (nrow(x) != length(y)) stop("Length of X and y differ.") else nobs <- nrow(x)
 
+### Check method ###
+if (!(method) %in% c('EQL', 'EQL1', 'HL11')) stop('Invalid method option.')
+
 ### Check data consistency ###
 if (is.null(Z)) stop("Design matrix for the random effects is missing.")
 if (!is.null(Z)) {
@@ -68,12 +71,11 @@ if (class(rand.family) == 'family') {
 		if (GammaLink == 'inverse') rand.family <- eval(GAMMA('inverse'))
 		if (!(GammaLink %in% c('log', 'identity', 'inverse'))) rand.family <- eval(GAMMA(link = 'log'))
 	}
-	if (rand.family$family == "CAR") {
+	if (rand.family$family %in% c("CAR", "SAR")) {
 		link.rand.disp <- rand.family$link.rand.disp
 		#z <- tcrossprod(z, rand.family$Dvec)
 		z <- z %*% as.matrix(rand.family$Dvec) # svd to eigen bug fix by Moudud
 		X.rand.disp <- list(model.matrix(~ rand.family$Deigen))
-		
 	}
 } else {
 	X.rand.disp <- c()
@@ -88,7 +90,7 @@ if (class(rand.family) == 'family') {
 			if (GammaLink == 'inverse') rand.family[[i]] <- eval(GAMMA('inverse'))
 			if (!(GammaLink %in% c('log', 'identity', 'inverse'))) rand.family[[i]] <- eval(GAMMA(link = 'log'))
 		}
-		if (rand.family[[i]]$family == "CAR") {
+		if (rand.family[[i]]$family %in% c("CAR", "SAR")) {
 			link.rand.disp <- rand.family[[i]]$link.rand.disp
 			#z[,colidx[[i]]] <- tcrossprod(z[,colidx[[i]]], rand.family[[i]]$Dvec)
 			z[,colidx[[i]]] <- z[,colidx[[i]]] %*% as.matrix(rand.family[[i]]$Dvec) # svd to eigen bug fix by Moudud
@@ -101,7 +103,7 @@ if (class(rand.family) == 'family') {
 
 ### Get augmented response, psi (Lee et al., 2006) ###
 if (class(rand.family) == 'family') {
-	if (rand.family$family == "gaussian" || rand.family$family == "CAR") {
+	if (rand.family$family %in% c("gaussian", "CAR", "SAR")) {
     	psi <- rep(0, nRand[k])
 	} else if (rand.family$family == "GAMMA" || rand.family$family == "inverse.gamma") {
     	psi <- rep(1, nRand[k])
@@ -113,7 +115,7 @@ if (class(rand.family) == 'family') {
 } else {
 	psi <- c()
 	for (i in 1:length(rand.family)) {
-		if (rand.family[[i]]$family == "gaussian" || rand.family[[i]]$family == "CAR") {
+		if (rand.family[[i]]$family %in% c("gaussian", "CAR", "SAR")) {
 			psi <- c(psi, rep(0, RandC[i]))
 		} else if (rand.family[[i]]$family == "GAMMA" || rand.family[[i]]$family == "inverse.gamma") {
 			psi <- c(psi, rep(1, RandC[i]))
@@ -149,6 +151,7 @@ if (ncol(z) > nrow(z) + 1 & length(RandC) == 1) {
 }
 
 ### Check starting values ###
+g1 <- glm(y ~ x - 1, family = family, weights = weights, offset = off) 
 if (!is.null(startval)) {
     if (!is.numeric(startval)) stop("Non-numeric starting value is not allowed.")
     if (length(startval) < ncol(x) + k + sum(nRand)) stop("Too few starting values. See hglm documentation.")
@@ -164,7 +167,6 @@ if (!is.null(startval)) {
 	if (min(init.sig.e, init.sig.u) < 1e-4) stop("Unacceptable initial value is supplied for the variance parameter.")
 } else {
 	### Generate default initial values of the fixed effects via a GLM ###
-    g1 <- glm(y ~ x - 1, family = family, weights = weights, offset = off)
     b.hat <- as.numeric(coef(g1))
     init.sig.u <- (init.sig.e <- as.numeric(.6*deviance(g1)/g1$df.residual))*.66
     if (k > 1) init.sig.u <- rep(init.sig.u/k, k)
@@ -245,10 +247,14 @@ if (!is.null(z)) {
 n <- length(Augy)
 p <- ncol(AugXZ)
 
+if (method == 'HL11') {
+	method <- 'EQL1'
+	cat('HL11 method option is now renamed as EQL1. Consider updating your code.\n')
+}
 HL.correction <- 0
 
 while (iter <= maxit) {
-	
+	#ii <<- iter
     g.mme <- GLM.MME(Augy = Augy, AugXZ = AugXZ, starting.delta = c(b.hat, v.i), tau = tau, phi = phi, 
                      n.fixed = ncol(x), n.random = nRand[k], weights.sqrt = w, prior.weights, family, 
                      rand.family, maxit, sparse = sparse, off = off, tol = 1e-7, colidx = colidx,
@@ -286,6 +292,7 @@ while (iter <= maxit) {
     }
     if (is.null(fix.disp)) {
     	if (is.null(x.disp)) {
+			#tmp <<- as.numeric(dev[1:nobs]/(1 - hv[1:nobs]))
     		g11 <- glm((as.numeric(dev[1:nobs]/(1 - hv[1:nobs]))) ~ 1, family = DispFamily, weights = as.numeric((1 - hv[1:nobs])/2))
         	if (length(g11$coef) == 1) {
       			sigma2e <- DispFamily$linkinv(as.numeric(g11$coef[1]))
@@ -294,6 +301,7 @@ while (iter <= maxit) {
       		}
 			tau <- as.numeric(g11$fitted.values) 
     	} else {
+			#tmp <<- as.numeric(dev[1:nobs]/(1 - hv[1:nobs]))
 			g11 <- glm((as.numeric(dev[1:nobs]/(1 - hv[1:nobs]))) ~ x.disp - 1, family = DispFamily, weights = as.numeric((1 - hv[1:nobs])/2))
         	if (length(g11$coef) == 1) {
       			sigma2e <- DispFamily$linkinv(as.numeric(g11$coef[1]))
@@ -316,29 +324,115 @@ while (iter <= maxit) {
     	devu <- as.numeric(dev[(devused + 1):devtouse])
     	hvu <- as.numeric(1 - hv[(devused + 1):devtouse])
 
+		#tmp2 <<- as.numeric(devu/hvu)
+		#XK <<- X.rand.disp
+		#w <<- hvu/2
+		
 		if (is.null(X.rand.disp[[K]])) {
 			g12 <- glm(devu/hvu ~ 1, family = Gamma(link = log), weights = hvu/2)
 			sigma2u <- exp(as.numeric(g12$coef[1]))
 		} else {
 			if (class(rand.family) == 'family') {
-				if (rand.family$family != "CAR") {
+				if (!(rand.family$family %in% c("CAR", "SAR"))) {
 					g12 <- glm(devu/hvu ~ X.rand.disp[[K]] - 1, family = Gamma(link = link.rand.disp), weights = hvu/2)
 					sigma2u <- NULL
-				} else {
-					g12 <- glm(devu/hvu ~ X.rand.disp[[K]] - 1, family = Gamma(link = link.rand.disp), weights = hvu/2)
+				} else if (rand.family$family == 'CAR') {
+					g12 <<- try(glm(devu/hvu ~ X.rand.disp[[K]] - 1, family = Gamma(link = link.rand.disp), weights = hvu/2), silent = TRUE)
+					if (inherits(g12, 'try-error')) {
+						for (l in 1:100) {
+							ndev <- length(devu)
+							idx <- sample(1:ndev, round(.75*ndev))
+							g120 <- try(glm(devu[idx]/hvu[idx] ~ X.rand.disp[[K]][idx,] - 1, family = Gamma(link = link.rand.disp), weights = hvu[idx]/2), silent = TRUE)
+							if (!inherits(g120, 'try-error')) {
+								mustart <- rep(NA, ndev)
+								mustart[idx] <- g120$fitted.values
+								mustart[is.na(mustart)] <- mean(devu/hvu)
+								g12 <- try(glm(devu/hvu ~ X.rand.disp[[K]] - 1, family = Gamma(link = link.rand.disp), weights = hvu/2, mustart = mustart), silent = TRUE)
+							}
+							if (!inherits(g12, 'try-error')) break
+							#if (inherits(g12, 'try-error')) l <- l + 1 else l <- length(devu)
+							#print(l)
+						}
+					}
+					if (inherits(g12, 'try-error')) warning('Internal Gamma GLM failed for CAR family!')
+					#print(g12)
 					sigma2u <- NULL
 					CAR.tau <- 1/g12$coef[1]
 					CAR.rho <- -g12$coef[2]/g12$coef[1]
+				} else {
+					g12 <- try(glm(devu/hvu ~ X.rand.disp[[K]] - 1, family = Gamma(link = inverse.sqrt()), weights = hvu/2), silent = TRUE)
+					if (inherits(g12, 'try-error')) {
+						for (l in 1:100) {
+							ndev <- length(devu)
+							idx <- sample(1:ndev, round(.75*ndev))
+							g120 <- try(glm(devu[idx]/hvu[idx] ~ X.rand.disp[[K]][idx,] - 1, family = Gamma(link = inverse.sqrt()), weights = hvu[idx]/2), silent = TRUE)
+							if (!inherits(g120, 'try-error')) {
+								mustart <- rep(NA, ndev)
+								mustart[idx] <- g120$fitted.values
+								mustart[is.na(mustart)] <- mean(devu/hvu)
+								g12 <- try(glm(devu/hvu ~ X.rand.disp[[K]] - 1, family = Gamma(link = inverse.sqrt()), weights = hvu/2, mustart = mustart), silent = TRUE)
+							}
+							if (!inherits(g12, 'try-error')) break
+							#if (inherits(g12, 'try-error')) l <- l + 1 else l <- length(devu)
+							#print(l)
+						}
+					}
+					if (inherits(g12, 'try-error')) warning('Internal Gamma GLM failed for SAR family!')
+					#print(g12)
+					sigma2u <- NULL
+					SAR.tau <- 1/g12$coef[1]**2
+					SAR.rho <- -g12$coef[2]/g12$coef[1]
 				}
 			} else {
-				if (rand.family[[K]]$family != "CAR") {
+				if (!(rand.family[[K]]$family %in% c("CAR", "SAR"))) {
 					g12 <- glm(devu/hvu ~ X.rand.disp[[K]] - 1, family = Gamma(link = link.rand.disp), weights = hvu/2)
 					sigma2u <- NULL
-				} else {
-					g12 <- glm(devu/hvu ~ X.rand.disp[[K]] - 1, family = Gamma(link = link.rand.disp), weights = hvu/2)
+				} else if (rand.family[[K]]$family == 'CAR') {
+					g12 <- try(glm(devu/hvu ~ X.rand.disp[[K]] - 1, family = Gamma(link = link.rand.disp), weights = hvu/2), silent = TRUE)
+					if (inherits(g12, 'try-error')) {
+						for (l in 1:100) {
+							ndev <- length(devu)
+							idx <- sample(1:ndev, round(.75*ndev))
+							g120 <- try(glm(devu[idx]/hvu[idx] ~ X.rand.disp[[K]][idx,] - 1, family = Gamma(link = link.rand.disp), weights = hvu[idx]/2), silent = TRUE)
+							if (!inherits(g120, 'try-error')) {
+								mustart <- rep(NA, ndev)
+								mustart[idx] <- g120$fitted.values
+								mustart[is.na(mustart)] <- mean(devu/hvu)
+								g12 <- try(glm(devu/hvu ~ X.rand.disp[[K]] - 1, family = Gamma(link = link.rand.disp), weights = hvu/2, mustart = mustart), silent = TRUE)
+							}
+							if (!inherits(g12, 'try-error')) break
+							#if (inherits(g12, 'try-error')) l <- l + 1 else l <- length(devu)
+							#print(l)
+						}
+					}
+					if (inherits(g12, 'try-error')) warning('Internal Gamma GLM failed for CAR/SAR family!')
+					#print(g12)
 					sigma2u <- NULL
 					CAR.tau <- 1/g12$coef[1]
 					CAR.rho <- -g12$coef[2]/g12$coef[1]
+				} else {
+					g12 <- try(glm(devu/hvu ~ X.rand.disp[[K]] - 1, family = Gamma(link = inverse.sqrt()), weights = hvu/2), silent = TRUE)
+					if (inherits(g12, 'try-error')) {
+						for (l in 1:100) {
+							ndev <- length(devu)
+							idx <- sample(1:ndev, round(.75*ndev))
+							g120 <- try(glm(devu[idx]/hvu[idx] ~ X.rand.disp[[K]][idx,] - 1, family = Gamma(link = inverse.sqrt()), weights = hvu[idx]/2), silent = TRUE)
+							if (!inherits(g120, 'try-error')) {
+								mustart <- rep(NA, ndev)
+								mustart[idx] <- g120$fitted.values
+								mustart[is.na(mustart)] <- mean(devu/hvu)
+								g12 <- try(glm(devu/hvu ~ X.rand.disp[[K]] - 1, family = Gamma(link = inverse.sqrt()), weights = hvu/2, mustart = mustart), silent = TRUE)
+							}
+							if (!inherits(g12, 'try-error')) break
+							#if (inherits(g12, 'try-error')) l <- l + 1 else l <- length(devu)
+							#print(l)
+						}
+					}
+					if (inherits(g12, 'try-error')) warning('Internal Gamma GLM failed for CAR/SAR family!')
+					#print(g12)
+					sigma2u <- NULL
+					SAR.tau <- 1/g12$coef[1]**2
+					SAR.rho <- -g12$coef[2]/g12$coef[1]
 				}
 			}
 		}
@@ -382,12 +476,12 @@ while (iter <= maxit) {
 	} else {
 		w <- sqrt(as.numeric((dmu_deta^2/family$variance(mu.i))*(1/tau))*prior.weights)
 	}
-	if (method == 'HL11' & class(rand.family) == 'family' & iter > 2*(is.null(fix.disp))) if (rand.family$family %in% c('gaussian', 'CAR')) HL.correction <- HL11(fv = fv, w = w, Z = Z, family = family, tau = tau)
+	if (method == 'EQL1' & class(rand.family) == 'family' & iter > 2*(is.null(fix.disp))) if (rand.family$family %in% c('gaussian', 'CAR', 'SAR')) HL.correction <- HL11(fv = fv, w = w, Z = Z, family = family, tau = tau)
 	eta0 <- eta.i
     iter <- iter + 1
 }
-if (method == 'HL11' & class(rand.family) == 'family') if (!(rand.family$family %in% c('gaussian', 'CAR'))) {
-	warning('HL(1,1) correction is not implemented yet for non-Gaussian random effects. EQL estimates are provided!')
+if (method == 'EQL1' & class(rand.family) == 'family') if (!(rand.family$family %in% c('gaussian', 'CAR', 'SAR'))) {
+	warning('EQL1 correction is not implemented yet for non-Gaussian random effects. EQL estimates are provided!')
 	method <- 'EQL'
 }
 names(b.hat) <- x.names
@@ -395,15 +489,15 @@ if (!is.null(z)) names(ui) <- z.names
 fixef <- b.hat                        
 if (!is.null(z)) ranef <- ui else ranef <- phi <- NULL
 if (class(rand.family) == 'family') {
-	if (rand.family$family == 'CAR') ranef <- rand.family$Dvec %*% ranef ## ranef for CAR calculation bug fixed by Lars 2014-01-20
+	if (rand.family$family %in% c('CAR', 'SAR')) ranef <- rand.family$Dvec %*% ranef ## ranef for CAR calculation bug fixed by Lars 2014-01-20
 } else {
 	for (i in 1:k) {
-		if (rand.family[[i]]$family == 'CAR') ranef[colidx[[i]]] <- rand.family[[i]]$Dvec %*% ranef[colidx[[i]]] ## ranef for CAR calculation bug fixed by Lars 2014-01-20
+		if (rand.family[[i]]$family %in% c('CAR', 'SAR')) ranef[colidx[[i]]] <- rand.family[[i]]$Dvec %*% ranef[colidx[[i]]] ## ranef for CAR calculation bug fixed by Lars 2014-01-20
 	}
 }
 
 val <- list(call = Call, fixef = fixef, ranef = ranef, RandC = RandC, phi = phi, varFix = sigma2e, 
-            varRanef = sigma2u, CAR.tau = NULL, CAR.rho = NULL, iter = iter, 
+            varRanef = sigma2u, CAR.tau = NULL, CAR.rho = NULL, SAR.tau = NULL, SAR.rho = NULL, iter = iter, 
 			Converge = "did not converge", SeFe = NULL, SeRe = NULL,
             dfReFe = NULL, SummVC1 = NULL, SummVC2 = NULL, method = method, dev = dev, hv = hv, 
             resid = resid, fv = fv, disp.fv = disp.fv, disp.resid = disp.resid, link.disp = link.disp, 
@@ -435,11 +529,19 @@ if (iter < maxit) {
 			val$CAR.tau = as.numeric(CAR.tau)
 			val$CAR.rho = as.numeric(CAR.rho)
 		}
+		if (rand.family$family == "SAR") {
+			val$SAR.tau = as.numeric(SAR.tau)
+			val$SAR.rho = as.numeric(SAR.rho)
+		}
 	} else {
 		for (i in 1:k) {
 			if (rand.family[[i]]$family == "CAR") {
 				val$CAR.tau = as.numeric(CAR.tau)
 				val$CAR.rho = as.numeric(CAR.rho)
+			}
+			if (rand.family[[i]]$family == "SAR") {
+				val$SAR.tau = as.numeric(SAR.tau)
+				val$SAR.rho = as.numeric(SAR.rho)
 			}
 		}
 	}

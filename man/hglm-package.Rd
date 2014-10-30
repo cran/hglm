@@ -9,14 +9,14 @@ The \code{hglm} package is used to fit hierarchical generalized linear models. I
 generalized linear models with random effects for a variety of links and a variety of distributions for both
 the outcomes and the random effects. Fixed effects can also be fitted in the dispersion part of the model.
 The function can be called either by specifying the design matrices or as a \code{\link{formula}}. The default estimation method is
-extended quasi likelihood (EQL; Lee et al., 2006) but from version 2.0 the HL11 correction has been implemented as well.   
+extended quasi likelihood (EQL; Lee et al., 2006) but from version 2.0 the EQL1 correction has been implemented as well.   
 }
 \details{
 \tabular{ll}{
 Package: \tab hglm\cr
 Type: \tab Package\cr
-Version: \tab 2.0-9\cr
-Date: \tab 2014-09-26\cr
+Version: \tab 2.0-11\cr
+Date: \tab 2014-10-30\cr
 Discussion: \tab https://r-forge.r-project.org/forum/?group_id=558\cr
 BugReports: \tab https://r-forge.r-project.org/tracker/?group_id=558\cr
 License: \tab GPL (>= 2)\cr
@@ -35,7 +35,7 @@ Youngjo Lee, John A Nelder and Yudi Pawitan (2006) \emph{Generalized Linear Mode
 
 Xia Shen, Moudud Alam, Freddy Fikse and Lars Ronnegard (2013). \bold{A novel generalized ridge regression method for quantitative genetics}. \emph{Genetics}.\cr\cr
 
-Moudud Alam, Lars Ronnegard, Xia Shen (2014). \bold{Spatial modeling in hglm}. \emph{Submitted}.
+Moudud Alam, Lars Ronnegard, Xia Shen (2014). \bold{Fitting conditional and simultaneous autoregressive spatial models in hglm}. \emph{Submitted}.
 }
 
 \keyword{package}

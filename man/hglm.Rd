@@ -25,7 +25,7 @@ hglm(X = NULL, y = NULL, Z = NULL, family = gaussian(link = identity),
   \item{Z}{\code{matrix}. The design matrix for the random effects.}
   \item{family}{\code{family}. The description of the error distribution and link function to be used in the mean part of the model. (See \code{\link{family}} for details of family functions.)}
   \item{rand.family}{\code{family}. The description of the distribution and link function to be used for the random effect.}
-  \item{method}{\code{character}. Estimation method where \code{EQL} is the method of interconnected GLMs presented in Lee et al (2006). Apart from the default option \code{EQL} there is also a \code{HL11} option, which improves estimation for GLMMs (especially for Poisson models with a large number of levels in the random effects).}
+  \item{method}{\code{character}. Estimation method where \code{EQL} is the method of interconnected GLMs presented in Lee et al (2006). Apart from the default option \code{EQL} there is also an \code{EQL1} option, which improves estimation for GLMMs (especially for Poisson models with a large number of levels in the random effects).}
   \item{conv}{\code{numeric}. The convergence criteria (change in linear predictor between iterations).}
   \item{maxit}{\code{numeric}. Maximum number of iterations in the \code{hglm} algorithm.}
   \item{startval}{\code{numeric}. A vector of starting values in the following order: fixed effects, random effect, variance of random effects, variance of residuals.}
@@ -91,7 +91,7 @@ Youngjo Lee, John A Nelder and Yudi Pawitan (2006) \emph{Generalized Linear Mode
 
 Xia Shen, Moudud Alam, Freddy Fikse and Lars Ronnegard (2013). \bold{A novel generalized ridge regression method for quantitative genetics}. \emph{Genetics}.\cr\cr
 
-Moudud Alam, Lars Ronnegard, Xia Shen (2014). \bold{Spatial modeling in hglm}. \emph{Submitted}.
+Moudud Alam, Lars Ronnegard, Xia Shen (2014). \bold{Fitting conditional and simultaneous autoregressive spatial models in hglm}. \emph{Submitted}.
 }
 \author{Moudud Alam, Lars Ronnegard, Xia Shen}
 
