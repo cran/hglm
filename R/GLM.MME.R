@@ -2,6 +2,8 @@
 	function(Augy, AugXZ, starting.delta, tau, phi, n.fixed, n.random, off,
              weights.sqrt, prior.weights, family, rand.family, maxit, 
 			 sparse = TRUE, tol = 1e-7, colidx, HL.correction = 0) {
+### restrict maxit with EQL1 is used
+if (any(HL.correction != 0)) maxit <- 3
 ### Set constants and working variables
 n <- length(Augy)
 p <- ncol(AugXZ)
@@ -67,8 +69,7 @@ while (maxmuit <= maxit){
 				du_dv <- c(du_dv, rand.family[[i]]$mu.eta(v.i[colidx[[i]]]))
 			}
 		}
-		zmi <- as.numeric(v.i + (psi - ui)/du_dv)
-    	Augz <- c(zi, zmi)
+        zmi <- as.numeric(v.i + (psi - ui)/du_dv)
 		if (class(rand.family) == 'family') {
     		w <- sqrt(as.numeric(c((dmu_deta^2/family$variance(mu.i))*(1/tau), (du_dv^2/rand.family$variance(ui))*(1/phi)))*prior.weights)
 		} else {
@@ -84,12 +85,20 @@ while (maxmuit <= maxit){
     	Augz <- zi
     	w <- sqrt(as.numeric(c((dmu_deta^2/family$variance(mu.i))*(1/tau))*prior.weights))
     }
+	####LRN 2015-04-20
+	if ( any(HL.correction != 0) ) {
+	  M <- diag(1/w[-(1:nk)]^2)%*%t(z)%*%diag(w[1:nk]^2)
+	  zmi <- zmi + as.numeric(M%*%HL.correction)
+	  rm(M)
+	}
+	Augz <- c(zi, zmi)
+	#####
 	if (all(is.na(eta.i))) stop('GLM.MME diverged! Try different starting values.')
     if (sum((eta0 - eta.i)^2) < tol*sum(eta.i^2)) break
     eta0 <- eta.i                                                           
     maxmuit <- maxmuit + 1
 }
-if (maxmuit > maxit) message(paste("GLM.MME did not converge in ", maxit, ":th iteration", sep = ''))
+if (maxmuit > maxit  & HL.correction == 0) message(paste("GLM.MME did not converge in ", maxit, ":th iteration", sep = ''))
 #qrs <- structure(fit[c("qr", "qraux", "pivot", "tol", "rank")],class="qr")
 hv <- rowSums(qr.qy(SQR, diag(1, nrow = n, ncol = p))^2)
 

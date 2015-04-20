@@ -3,7 +3,7 @@
              rand.family = gaussian(link = identity), method = "EQL",
              conv = 1e-6, maxit = 50, startval = NULL, X.disp = NULL, disp = NULL,
              link.disp = "log", weights = NULL, fix.disp = NULL, offset = NULL, 
-             sparse = TRUE, vcovmat = FALSE, calc.like = FALSE, 
+             sparse = TRUE, vcovmat = FALSE, calc.like = FALSE, RandC = NULL,
 			 bigRR = FALSE, verbose = FALSE, ...) {
          
 Call <- match.call(expand.dots = FALSE)
@@ -17,7 +17,7 @@ MainTerms <- attributes(MainTerms)$term.labels
 RandTerms <- grepl("\\|",MainTerms)
 NrRef <- sum(RandTerms)
 if (NrRef == 0) stop("meanmodel must contain one or more random effects")
-if (length(MainTerms) == NrRef & Intercept == 0) stop("Model must cntain at least one fixed effect, e.g. an intercept")
+if (length(MainTerms) == NrRef & Intercept == 0) stop("Model must contain at least one fixed effect, e.g. an intercept")
 MainTerms <- c(Intercept, MainTerms)
 RandTerms <- c(FALSE, RandTerms)
 fixed <- as.formula(paste(MainResponse, "~", paste(MainTerms[!RandTerms], collapse = "+")))
@@ -75,7 +75,7 @@ for(i in 1:NrRef) {
 	} else if (length(RanTerm) == 2) {
 		Clust <- get_all_vars(as.formula(paste("~", RanTerm[2])), data = data)
 		if (NCOL(Clust) > 1) stop(gettextf("Random term %d in mainmodel contains multiple cluster (grouping) variable.", i), domain = NA) 
-		if (NROW(Clust) != NROW(X)) stop(gettextf("Length of cluster/grouping variable in random term %d contradicts.", i), domain = NA)
+		if (NROW(Clust) != NROW(X)) stop(gettextf("Remove all NA before input to the hglm function. Length of cluster/grouping variable in random term %d contradicts.", i), domain = NA)
 		Clust <- factor(as.vector(Clust[,1]))
 		Col <- as.numeric(unclass(Clust))
 		RandLevel <- attributes(Clust)$levels
@@ -99,11 +99,24 @@ for(i in 1:NrRef) {
 	} else stop(gettextf("Random term %d in mainmodel contain too many |'s.", i), domain = NA)
 }
 
-val <- hglm.default(X = X, y = Y, Z = Z, family = family, rand.family = rand.family, X.disp = x.disp,
-                    link.disp = link.disp, method = method, conv = conv, maxit = maxit, startval = startval,
-                    weights = weights, fix.disp = fix.disp, offset = offset, sparse = sparse, 
-					vcovmat = vcovmat, calc.like = calc.like, bigRR = bigRR, verbose = verbose, ...)
-			
+####Check NA in y, X, Z ####
+#### added by lrn 2015-03-24
+if ( sum( is.na( model.frame(fixed, na.action=NULL, data=data) ) ) >0 )  warning( "NA in response and/or fixed term. Remove all NA before input to the hglm function.", immediate.=TRUE)
+if ( nrow(Z) < nrow( model.frame(fixed, na.action=NULL, data=data ) ) ) warning( "NA in random effects term. Remove all NA before input to the hglm function.", immediate.=TRUE)
+if (!is.null(disp)) {
+	if ( nrow(x.disp) < nrow( model.frame(fixed, na.action=NULL, data=data ) ) ) warning( "NA in terms of the dispersion model. Remove all NA before input to the hglm function.", immediate.=TRUE)
+} 
+if (is.null(RandC)) {
+	val <- hglm.default(X = X, y = Y, Z = Z, family = family, rand.family = rand.family, X.disp = x.disp,
+    	                link.disp = link.disp, method = method, conv = conv, maxit = maxit, startval = startval,
+        	            weights = weights, fix.disp = fix.disp, offset = offset, RandC = nRand, sparse = sparse, 
+						vcovmat = vcovmat, calc.like = calc.like, bigRR = bigRR, verbose = verbose, ...)
+} else {
+	val <- hglm.default(X = X, y = Y, Z = Z, family = family, rand.family = rand.family, X.disp = x.disp,
+			link.disp = link.disp, method = method, conv = conv, maxit = maxit, startval = startval,
+			weights = weights, fix.disp = fix.disp, offset = offset, sparse = sparse, 
+			vcovmat = vcovmat, calc.like = calc.like, bigRR = bigRR, verbose = verbose, ...)
+}
 val$call <- Call
 
 return(val)

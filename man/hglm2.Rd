@@ -14,7 +14,7 @@ hglm2(meanmodel, data = NULL, family = gaussian(link = identity),
       X.disp = NULL, disp = NULL, link.disp = "log", 
       weights = NULL, fix.disp = NULL, offset = NULL, 
       sparse = TRUE, vcovmat = FALSE, calc.like = FALSE, 
-      bigRR = FALSE, verbose = FALSE, ...)
+      RandC = NULL, bigRR = FALSE, verbose = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -35,6 +35,7 @@ hglm2(meanmodel, data = NULL, family = gaussian(link = identity),
   \item{sparse}{\code{logical}. If \code{TRUE}, the computation is to be carried out by using sparse matrix technique.}
   \item{vcovmat}{logical. If \code{TRUE}, the variance-covariance matrix is exported.}
   \item{calc.like}{logical. If \code{TRUE}, likelihoods will be computed at convergence and will be shown via the print or summary methods on the output object.}
+  \item{RandC}{\code{numeric}. Necessary in old versions but can be neglected now. Integers (possibly a vector) specifying the number of column of Z to be used for each of the random-effect terms. }
   \item{bigRR}{logical. If \code{TRUE}, and only for the Gaussian model with one random effect term, a specific algorithm will be used for fast fitting high-dimensional (p >> n) problems. See Shen et al. (2013) for more details of the method.}
   \item{verbose}{logical. If \code{TRUE}, more information is printed during model fitting process.}
   \item{\dots}{not used.}
@@ -71,6 +72,7 @@ It returns an object of class \code{hglm} consiting of the following values.
   \item{link.disp}{link function for the dispersion part of the model.}
   \item{vcov}{the variance-covariance matrix.}
   \item{likelihood}{a list of log-likelihood values for model selection purposes, where \code{$hlik} is -2 times the log-h-likelihood, \code{$pvh} -2 times the adjusted profile log-likelihood profiled over random effects, \code{$pbvh} -2 times the adjusted profile log-likelihood profiled over fixed and random effects, and \code{$cAIC} the conditional AIC.}
+  \item{bad}{the index of the influential observation.}
 }
 \references{
 Lars Ronnegard, Xia Shen and Moudud Alam (2010). \bold{hglm: A Package for Fitting Hierarchical Generalized Linear Models}. \emph{The R Journal}, \bold{2}(2), 20-28.\cr\cr

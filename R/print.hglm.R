@@ -82,5 +82,9 @@ if (!is.null(x$varRanef)) {
 }
 cat(paste("\nEstimation", x$Converge, "in", x$iter, "iterations\n"))
 
+if (!is.null(x$bad)) {
+	cat('\n!! Observation', x$bad, 'is too influential! Estimates are likely unreliable !!')
+}
+
 }
 

@@ -51,12 +51,20 @@ hglm(X = NULL, y = NULL, Z = NULL, family = gaussian(link = identity),
 }
 \details{
   Models for \code{hglm} are either specified symbolically using \code{\link{formula}} 
-  or by specifying the design matrices ( \code{X}, \code{Z} and \code{X.disp}). Currently, only the extended quasi likelihood (EQL)
-  method is available for the estimation of the model parameters. Only for the Gaussian-Gaussina linear mixed models, it
+  or by specifying the design matrices ( \code{X}, \code{Z} and \code{X.disp}). The extended quasi likelihood (EQL)
+  method is the default method for estimation of the model parameters. For the Gaussian-Gaussian linear mixed models, it
   is REML. It should be noted that the EQL estimator can be biased and inconsistent in some special cases e.g. binary pair matched response. A higher order correction 
-  might be useful to correct the bias of EQL (Lee et al. 2006). But, those currections are not implemented in the current version. By default, the dispersion
-  parameter is always estimated via EQL. If the dispersion parameter of the mean model is to be held constant, for example if it is
+  might be useful to correct the bias of EQL (Lee et al. 2006). There is also an \code{EQL1} option, which improves estimation for GLMMs (especially for Poisson models with a large number of levels in the random effects). The \code{EQL1} method computes estimates by adjusting the working response as described in the appendix of Lee and Lee (2012). \cr
+  By default, the dispersion
+  parameter is estimated by the \code{hglm} and \code{hglm2} functions. If the dispersion parameter of the mean model is to be held constant, for example if it is
   desired to be 1 for binomial and Poisson family, then \code{fix.disp}=value where, value=1 for the above example, should be used. 
+  \cr\cr
+  \bold{Interpretation of warning messages} \cr
+  \emph{Remove all NA before input to the hglm function.}\cr
+  - This message is important and tells the user to delete all lines with missing values from the input data.\cr\cr
+  \emph{Residuals numerically 0 are replaced by 1e-8.} or \cr
+  \emph{Hat-values numerically 1 are replaced by 1 - 1e-8.}\cr
+  - These messages are often not important as they usually reflect a numerical issue in an intermediate step of the iterative fitting algorithm. However, it is a good idea to check that there are no hat values equal to 1 in the final output. 
 }
 \value{
 It returns an object of class \code{hglm} consiting of the following values.
@@ -82,16 +90,20 @@ It returns an object of class \code{hglm} consiting of the following values.
   \item{disp.resid}{standardized deviance residuals for the dispersion part of the model.}
   \item{link.disp}{link function for the dispersion part of the model.}
   \item{vcov}{the variance-covariance matrix.}
-  \item{likelihood}{a list of log-likelihood values for model selection purposes, where \code{$hlik} is -2 times the log-h-likelihood, \code{$pvh} -2 times the adjusted profile log-likelihood profiled over random effects, \code{$pbvh} -2 times the adjusted profile log-likelihood profiled over fixed and random effects, and \code{$cAIC} the conditional AIC.}
+  \item{likelihood}{a list of log-likelihood values for model selection purposes, where \code{$hlik} is the log-h-likelihood, \code{$pvh} the adjusted profile log-likelihood profiled over random effects, \code{$pbvh} the adjusted profile log-likelihood profiled over fixed and random effects, and \code{$cAIC} the conditional AIC. (NOTE: In some earlier version (version <2.0) -2 times the log-likelihoods were reported.)}
+  \item{bad}{the index of the influential observation.}
 }
 \references{
 Lars Ronnegard, Xia Shen and Moudud Alam (2010). \bold{hglm: A Package for Fitting Hierarchical Generalized Linear Models}. \emph{The R Journal}, \bold{2}(2), 20-28.\cr\cr
 
 Youngjo Lee, John A Nelder and Yudi Pawitan (2006) \emph{Generalized Linear Models with Random Effect: a unified analysis via h-likelihood.} Chapman and Hall/CRC.\cr\cr
 
-Xia Shen, Moudud Alam, Freddy Fikse and Lars Ronnegard (2013). \bold{A novel generalized ridge regression method for quantitative genetics}. \emph{Genetics}.\cr\cr
+Xia Shen, Moudud Alam, Freddy Fikse and Lars Ronnegard (2013). \bold{A novel generalized ridge regression method for quantitative genetics}. \emph{Genetics} \bold{193}(4), ?1255-1268. \cr\cr
 
-Moudud Alam, Lars Ronnegard, Xia Shen (2014). \bold{Fitting conditional and simultaneous autoregressive spatial models in hglm}. \emph{Submitted}.
+Moudud Alam, Lars Ronnegard, Xia Shen (2014). \bold{Fitting conditional and simultaneous autoregressive spatial models in hglm}. \emph{Submitted}.\cr\cr
+
+Woojoo Lee and Youngjo Lee (2012). \bold{Modifications of REML algorithm for hglms}. \emph{Statistics and Computing} \bold{22}, 959-966.
+
 }
 \author{Moudud Alam, Lars Ronnegard, Xia Shen}
 

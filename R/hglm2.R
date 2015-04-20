@@ -4,6 +4,6 @@
              conv = 1e-6, maxit = 50, startval = NULL,
              X.disp = NULL, disp = NULL, link.disp = "log", 
              weights = NULL, fix.disp = NULL, offset = NULL, sparse = TRUE,
-			 vcovmat = FALSE, calc.like = FALSE, 
+			 vcovmat = FALSE, calc.like = FALSE, RandC = NULL,
 			 bigRR = FALSE, verbose = FALSE, ...) UseMethod("hglm2")
 

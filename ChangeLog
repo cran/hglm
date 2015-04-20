@@ -1,3 +1,31 @@
+2015-05-13 21:47 xia
+
+    * Bug fixed for two random effects variance components
+    * Bug fixed for EQL1 HL.correction checking
+
+2015-04-20 18:06 lrn
+
+    * Update to version 2.1-0
+    * Improved computational stability of likelihoods
+    * log-likelihood values reported instead of -2 times log-likelihood
+    * Likelihood computations enabled for several random effects 
+      coming from different distributions
+    * Bug in likelihood computations for non-Gaussian outcomes corrected
+    * logLik function added.
+    * Warning messages added for NA in y, X, Z and X.disp
+    * Accuracy of EQL1 computations improved in the GLM.MME function
+    * all(sigma2u/(sum(sigma2u)+sigma2e) < (1-1e-4)) added to check for 
+      convergence in the hglm.default function
+
+2015-01-30 10:28 xia
+
+    * Update to version 2.0-12
+    * hglm2() number of variance components bug fixed
+    * Starting value checking for multiple random
+      effects bug fixed
+    * Vignette updated
+    * Large hat-values checking improved
+
 2014-10-30 16:24 xia
 
     * Update to version 2.0-11

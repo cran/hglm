@@ -11,7 +11,7 @@ if (is.null(X)) stop("X is missing with no default")
 if (max(inherits(X, c("Matrix", "matrix"))) != 1) stop("X is not a sparse/dense matrix.")
 x <- as.matrix(X)
 y <- as.vector(y)
-if (nrow(x) != length(y)) stop("Length of X and y differ.") else nobs <- nrow(x)
+if (nrow(x) != length(y)) stop("Length of X and y differ. Remove all NA before input to the hglm function.") else nobs <- nrow(x)
 
 ### Check method ###
 if (!(method) %in% c('EQL', 'EQL1', 'HL11')) stop('Invalid method option.')
@@ -21,7 +21,7 @@ if (is.null(Z)) stop("Design matrix for the random effects is missing.")
 if (!is.null(Z)) {
 	if (max(inherits(Z, c("Matrix", "matrix"))) != 1) stop("Z is not a sparse/dense matrix.")
 	z <- Z
-	if (nrow(x) != nrow(z)) stop("Length of X and Z differ.")
+	if (nrow(x) != nrow(z)) stop("Length of X and Z differ. Remove all NA before input to the hglm function.")
 	nRand <- cumsum(RandC)
 	k <- length(nRand) ### gets number of random effects
 	if (max(nRand) != ncol(z)) stop("sum(RandC) differs from number of columns in Z")
@@ -34,6 +34,11 @@ if (!is.null(Z)) {
 	}
 } else stop("Random effects are missing with no default.")
 if (!is.null(X.disp)) x.disp <- as.matrix(X.disp) else x.disp <- NULL
+
+####Check NA in y, X, Z and X.disp####
+#### added by lrn 2015-03-24
+
+if ( sum( is.na( cbind( y, x, Z, x.disp ) ) ) > 0) warning( "Remove all NA before input to the hglm function.", immediate.=TRUE)
 
 ### Check prior weights ###
 if (is.null(weights)) {
@@ -154,16 +159,16 @@ if (ncol(z) > nrow(z) + 1 & length(RandC) == 1) {
 g1 <- glm(y ~ x - 1, family = family, weights = weights, offset = off) 
 if (!is.null(startval)) {
     if (!is.numeric(startval)) stop("Non-numeric starting value is not allowed.")
-    if (length(startval) < ncol(x) + k + sum(nRand)) stop("Too few starting values. See hglm documentation.")
+    if (length(startval) < ncol(x) + k + sum(RandC)) stop("Too few starting values. See hglm documentation.")
     if ((family$family == "gaussian" || family$family=="Gamma") & length(startval) < ncol(x) + nRand[k] + k + 1) stop("Too few starting values. See the documentation of hglm.")
     b.hat <- startval[1:ncol(x)]
-    if (length(startval) > (ncol(x) + k + sum(nRand))) {
+    if (length(startval) > (ncol(x) + k + sum(RandC))) {
     	init.sig.e <- as.numeric(startval[length(startval)])
     } else {
     	init.sig.e <- 1
     }
-	init.u <- startval[(ncol(x) + 1):(ncol(x) + sum(nRand))]
-	init.sig.u <- as.numeric(startval[(ncol(x) + sum(nRand) + 1)])
+	init.u <- startval[(ncol(x) + 1):(ncol(x) + sum(RandC))]
+	init.sig.u <- as.numeric(startval[(ncol(x) + sum(RandC) + 1)])
 	if (min(init.sig.e, init.sig.u) < 1e-4) stop("Unacceptable initial value is supplied for the variance parameter.")
 } else {
 	### Generate default initial values of the fixed effects via a GLM ###
@@ -252,9 +257,17 @@ if (method == 'HL11') {
 	cat('HL11 method option is now renamed as EQL1. Consider updating your code.\n')
 }
 HL.correction <- 0
+bad <- NULL
 
 while (iter <= maxit) {
 	#ii <<- iter
+	#if (iter == 1) {
+	#	mmein <- list(Augy = Augy, AugXZ = AugXZ, starting.delta = c(b.hat, v.i), tau = tau, phi = phi, 
+    #                 n.fixed = ncol(x), n.random = nRand[k], weights.sqrt = w, prior.weights, family, 
+    #                 rand.family, maxit, sparse = sparse, off = off, tol = 1e-7, colidx = colidx,
+	#				 HL.correction = HL.correction)
+	#	save(mmein, file = 'mmein.RData')
+	#}
     g.mme <- GLM.MME(Augy = Augy, AugXZ = AugXZ, starting.delta = c(b.hat, v.i), tau = tau, phi = phi, 
                      n.fixed = ncol(x), n.random = nRand[k], weights.sqrt = w, prior.weights, family, 
                      rand.family, maxit, sparse = sparse, off = off, tol = 1e-7, colidx = colidx,
@@ -273,8 +286,8 @@ while (iter <= maxit) {
     fv <- g.mme$fv
     hv <- g.mme$hv
 	if (any(abs(hv) > 1 - 1e-8)) {
-		hv <- ifelse(abs(hv) > 1 - 1e-8, 1 - 1e-8,hv)
-		warning("Hatvalues numerically 1 are replaced by 1 - 1e-8")
+		warning("Hat-values numerically 1 are replaced by 1 - 1e-8")
+		hv <- ifelse(abs(hv) > 1 - 1e-8, 1 - 1e-8, hv)
 	}
     mu.i <- family$linkinv(eta.i)
     dmu_deta <- family$mu.eta(eta.i)
@@ -462,7 +475,7 @@ while (iter <= maxit) {
 		cat("Sum of squared linear predictor:", sum(eta.i^2), "\n")
 		cat("Convergence:", sum((eta0 - eta.i)^2)/sum(eta.i^2), "\n")
 	}
-	if (sum((eta0 - eta.i)^2) < conv*sum(eta.i^2) & iter > 1) break
+	if (sum((eta0 - eta.i)^2) < conv*sum(eta.i^2) & iter > 1 ) break
     if (!is.null(z)) {
 		if (class(rand.family) == 'family') {
 			w <- sqrt(as.numeric(c((dmu_deta^2/family$variance(mu.i))*(1/tau), (du_dv^2/rand.family$variance(ui))*(1/phi)))*prior.weights)
@@ -496,15 +509,23 @@ if (class(rand.family) == 'family') {
 	}
 }
 
+sigma6 <- mean(hv[1:nobs]) + 6*sd(hv[1:nobs])
+if (max(hv[1:nobs]) > sigma6) {
+	bad <- which.max(hv[1:nobs])
+}
+
+sigma2u <- numeric(k)
+for (K in 1:k) sigma2u[K] <- exp(unlist(VC2[[K]])[1])
+
 val <- list(call = Call, fixef = fixef, ranef = ranef, RandC = RandC, phi = phi, varFix = sigma2e, 
             varRanef = sigma2u, CAR.tau = NULL, CAR.rho = NULL, SAR.tau = NULL, SAR.rho = NULL, iter = iter, 
 			Converge = "did not converge", SeFe = NULL, SeRe = NULL,
             dfReFe = NULL, SummVC1 = NULL, SummVC2 = NULL, method = method, dev = dev, hv = hv, 
             resid = resid, fv = fv, disp.fv = disp.fv, disp.resid = disp.resid, link.disp = link.disp, 
 			link.rand.disp = link.rand.disp, vcov = NULL, likelihood = NULL, call.rand.family = rand.family,
-			null.model = g1)
+			null.model = g1, bad = bad)
 
-if (iter < maxit) {
+if (iter < maxit & all(sigma2u/(sum(sigma2u)+sigma2e) < (1-1e-4))) {
 	val$Converge <- "converged"
 	### Calculate the standard errors of the fixed and random effects ###
 	p1 <- 1:p

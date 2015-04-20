@@ -143,5 +143,9 @@ if (!is.null(x$likelihood)) {
 }
 cat(x$Method, "estimation", x$converge, "in", x$iter, "iterations.\n")
 
+if (!is.null(x$bad)) {
+	cat('\n!! Observation', x$bad, 'is too influential! Estimates are likely unreliable !!')
+}
+
 }
 
