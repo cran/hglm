@@ -1,3 +1,13 @@
+2015-08-28 11:21 xia
+
+    * Update to version 2.1-1
+    * Bug fixed for GLM.MME() and hglm(2).formula
+    * Vignette updated
+
+2015-08-21 13:02 xia
+
+    * Bug fixed for inverse.gamma() and inverse.sqrt() links
+
 2015-05-13 21:47 xia
 
     * Bug fixed for two random effects variance components

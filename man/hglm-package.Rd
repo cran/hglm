@@ -15,8 +15,8 @@ extended quasi likelihood (EQL; Lee et al., 2006) but from version 2.0 the EQL1 
 \tabular{ll}{
 Package: \tab hglm\cr
 Type: \tab Package\cr
-Version: \tab 2.1-0\cr
-Date: \tab 2015-04-20\cr
+Version: \tab 2.1-1\cr
+Date: \tab 2015-08-28\cr
 Discussion: \tab https://r-forge.r-project.org/forum/?group_id=558\cr
 BugReports: \tab https://r-forge.r-project.org/tracker/?group_id=558\cr
 License: \tab GPL (>= 2)\cr

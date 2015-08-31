@@ -3,7 +3,7 @@
              weights.sqrt, prior.weights, family, rand.family, maxit, 
 			 sparse = TRUE, tol = 1e-7, colidx, HL.correction = 0) {
 ### restrict maxit with EQL1 is used
-if (any(HL.correction != 0)) maxit <- 3
+#if (any(HL.correction != 0)) maxit <- 3
 ### Set constants and working variables
 n <- length(Augy)
 p <- ncol(AugXZ)
@@ -57,8 +57,7 @@ while (maxmuit <= maxit){
 		eta.i <- as.numeric(x%*%b.hat + z%*%v.i + off)
     	mu.i <- family$linkinv(eta.i)
     	dmu_deta <- family$mu.eta(eta.i)
-    	zi <- eta.i - off + (y - mu.i)/dmu_deta
-    	zi <- zi - HL.correction
+    	zi <- eta.i - off + (y - mu.i)/dmu_deta   	
 		if (class(rand.family) == 'family') {
     		ui <- rand.family$linkinv(v.i)
     		du_dv <- rand.family$mu.eta(v.i)
@@ -87,6 +86,8 @@ while (maxmuit <= maxit){
     }
 	####LRN 2015-04-20
 	if ( any(HL.correction != 0) ) {
+	  HL.correction <- HL11(fv = mu.i, w = w, Z = z, family = family, tau = tau)
+    zi <- zi - HL.correction
 	  M <- diag(1/w[-(1:nk)]^2)%*%t(z)%*%diag(w[1:nk]^2)
 	  zmi <- zmi + as.numeric(M%*%HL.correction)
 	  rm(M)

@@ -78,7 +78,7 @@ if (!is.factor(data[1:2, RanTerm[2]])) {
     }
 }
 ranf <- as.formula(ranf)
-rmf <- model.frame(ranf, data)
+rmf <- model.frame(ranf, data, drop.unused.levels = TRUE) # bug fixed by maa 150828
 z <- model.matrix(attr(rmf, "terms"), data = rmf)
 row.names(z) <- NULL
 

@@ -80,7 +80,8 @@ for(i in 1:NrRef) {
 		Col <- as.numeric(unclass(Clust))
 		RandLevel <- attributes(Clust)$levels
 		if (i == 1) nRand <- length(RandLevel)
-		RandCvt <- model.matrix(as.formula(paste("~", RanTerm[1])), data = data)
+		RandCvtmf <- model.frame(as.formula(paste("~", RanTerm[1])), data = data,drop.unused.levels=TRUE)
+		RandCvt <- model.matrix(attr(RandCvtmf, "terms"), data = RandCvtmf) # bug fixed by maa 150828
 		CheckCatCov <- attributes(RandCvt)$contrasts
 		if (!is.null(CheckCatCov)) stop(paste("Categorical covariate",names(CheckCatCov), "not allowed in random effects"))
 		if ((NROW(RandCvt) > 0) & (NCOL(RandCvt) > 0)) {

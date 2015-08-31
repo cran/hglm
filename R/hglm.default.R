@@ -489,7 +489,7 @@ while (iter <= maxit) {
 	} else {
 		w <- sqrt(as.numeric((dmu_deta^2/family$variance(mu.i))*(1/tau))*prior.weights)
 	}
-	if (method == 'EQL1' & class(rand.family) == 'family' & iter > 2*(is.null(fix.disp))) if (rand.family$family %in% c('gaussian', 'CAR', 'SAR')) HL.correction <- HL11(fv = fv, w = w, Z = Z, family = family, tau = tau)
+	if (method == 'EQL1' & class(rand.family) == 'family' & iter >= 2*(is.null(fix.disp))) if (rand.family$family %in% c('gaussian', 'CAR', 'SAR')) HL.correction <- HL11(fv = fv, w = w, Z = Z, family = family, tau = tau)
 	eta0 <- eta.i
     iter <- iter + 1
 }
