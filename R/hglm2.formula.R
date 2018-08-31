@@ -80,8 +80,7 @@ for(i in 1:NrRef) {
 		Col <- as.numeric(unclass(Clust))
 		RandLevel <- attributes(Clust)$levels
 		if (i == 1) nRand <- length(RandLevel)
-		RandCvtmf <- model.frame(as.formula(paste("~", RanTerm[1])), data = data,drop.unused.levels=TRUE)
-		RandCvt <- model.matrix(attr(RandCvtmf, "terms"), data = RandCvtmf) # bug fixed by maa 150828
+		RandCvt <- model.matrix(as.formula(paste("~", RanTerm[1])), data = data)
 		CheckCatCov <- attributes(RandCvt)$contrasts
 		if (!is.null(CheckCatCov)) stop(paste("Categorical covariate",names(CheckCatCov), "not allowed in random effects"))
 		if ((NROW(RandCvt) > 0) & (NCOL(RandCvt) > 0)) {
@@ -92,7 +91,7 @@ for(i in 1:NrRef) {
         		} else {
         			ZJ <- sparseMatrix(i = 1:nrow(data), j = Col, x = as.numeric(RandCvt[,J]), dims = c(nrow(data), length(RandLevel)))
         			colnames(ZJ) <- paste(colnames(RandCvt)[J], "|", RanTerm[2], ":", RandLevel, sep = "")
-        			Z <- cBind(Z, ZJ)
+        			Z <- cbind(Z, ZJ)
         			nRand <- c(nRand, ncol(ZJ))
         		}
         	}

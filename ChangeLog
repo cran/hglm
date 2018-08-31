@@ -1,8 +1,12 @@
-2015-08-28 11:21 xia
+2015-08-24 11:16 xia
 
-    * Update to version 2.1-1
-    * Bug fixed for GLM.MME() and hglm(2).formula
-    * Vignette updated
+    * Update to version 2.2-0
+    * All rBind/cBind replaced by rbind/cbind due to
+      the change in Matrix package (hglm was archived
+      on CRAN for a few weeks due to this)
+    * Minor Rd files for inverse.sqrt and inverse.gamma
+      added due to CRAN requirement
+    * http link changed to https
 
 2015-08-21 13:02 xia
 

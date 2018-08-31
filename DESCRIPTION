@@ -1,16 +1,16 @@
 Package: hglm
 Type: Package
 Title: Hierarchical Generalized Linear Models
-Version: 2.1-1
-Date: 2015-08-28
+Version: 2.2-0
+Date: 2018-08-24
 Author: Moudud Alam, Lars Ronnegard, Xia Shen
 Maintainer: Xia Shen <xia.shen@ki.se>
-Description: Procedures for fitting hierarchical generalized linear models (HGLM). It can be used for linear mixed models and generalized linear mixed models with random effects for a variety of links and a variety of distributions for both the outcomes and the random effects. Fixed effects can also be fitted in the dispersion part of the mean model.
+Description: Implemented here are procedures for fitting hierarchical generalized linear models (HGLM). It can be used for linear mixed models and generalized linear mixed models with random effects for a variety of links and a variety of distributions for both the outcomes and the random effects. Fixed effects can also be fitted in the dispersion part of the mean model. As statistical models, HGLMs were initially developed by Lee and Nelder (1996) <https://www.jstor.org/stable/2346105?seq=1>. We provide an implementation (Ronnegard, Alam and Shen 2010) <https://journal.r-project.org/archive/2010-2/RJournal_2010-2_Roennegaard~et~al.pdf> following Lee, Nelder and Pawitan (2006) <ISBN: 9781420011340> with algorithms extended for spatial modeling (Alam, Ronnegard and Shen 2015) <https://journal.r-project.org/archive/2015/RJ-2015-017/RJ-2015-017.pdf>. 
 BugReports: https://r-forge.r-project.org/tracker/?group_id=558
 License: GPL (>= 2)
 LazyLoad: yes
-Depends: R (>= 2.10), utils, Matrix, MASS, hglm.data
-Packaged: 2015-08-31 09:00:47 UTC; xia
+Depends: R (>= 3.0), utils, Matrix, MASS, hglm.data
+Packaged: 2018-08-31 07:35:17 UTC; xia
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2015-08-31 15:17:50
+Date/Publication: 2018-08-31 08:09:03 UTC

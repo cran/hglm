@@ -10,13 +10,13 @@ citEntry(entry="Article",
          volume       = "2",
          number       = "2",
          pages        = "20-28",
-         url          = "http://journal.r-project.org/archive/2010-2/RJournal_2010-2_Roennegaard~et~al.pdf",
+         url          = "https://journal.r-project.org/archive/2010-2/RJournal_2010-2_Roennegaard~et~al.pdf",
          
          textVersion = 
          paste("Lars Ronnegard, Xia Shen and Moudud Alam (2010)", 
                "hglm: A Package for Fitting Hierarchical Generalized Linear Models.",
                "The R Journal, 2(2): 20-28.",
-               "URL http://journal.r-project.org/archive/2010-2/RJournal_2010-2_Roennegaard~et~al.pdf.")
+               "URL https://journal.r-project.org/archive/2010-2/RJournal_2010-2_Roennegaard~et~al.pdf.")
 )
 
 citEntry(entry="Article",
@@ -24,17 +24,17 @@ citEntry(entry="Article",
          author = personList(as.person("Moudud Alam"),
                              as.person("Lars Ronnegard"),
                              as.person("Xia Shen")),
-         journal      = "Submitted",
-         year         = "2014",
-         volume       = "0",
-         number       = "0",
-         pages        = "0-0",
-         url          = "",
+         journal      = "The R Journal",
+         year         = "2015",
+         volume       = "7",
+         number       = "2",
+         pages        = "5-18",
+         url          = "https://journal.r-project.org/archive/2015/RJ-2015-017/RJ-2015-017.pdf",
          
          textVersion = 
          paste("Moudud Alam, Lars Ronnegard and Xia Shen (2014)", 
                "Fitting Conditional and Simultaneous Autoregressive Spatial Models in hglm.",
-               "Submitted, 0(0): 0-0.",
-               "URL .")
+               "Submitted, 7(2): 5-18.",
+               "URL https://journal.r-project.org/archive/2015/RJ-2015-017/RJ-2015-017.pdf")
 )
 

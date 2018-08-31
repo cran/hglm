@@ -1,14 +1,15 @@
-import("Matrix", "MASS", "hglm.data")
+importFrom("graphics", "abline", "hist", "lines", "par", "plot")
 importFrom("grDevices", "dev.new", "dev.off", "pdf")
-     importFrom("graphics", "abline", "hist", "lines", "par", "plot")
-     importFrom("stats", "Gamma", "as.formula", "coef", "dbeta", "dbinom",
-     "deviance", "dgamma", "dnorm", "gaussian", "get_all_vars",
-     "glm", "hatvalues", "is.empty.model", "loess.smooth",
-     "logLik", "make.link", "model.frame", "model.matrix",
-     "model.offset", "model.response", "model.weights", "pchisq",
-     "printCoefmat", "pt", "qqline", "qqnorm", "residuals",
-     "rgamma", "sd", "terms", "var")
-     importFrom("utils", "packageDescription")
+importFrom("stats", "as.formula", "coef", "dbeta", "dbinom",
+             "deviance", "dgamma", "dnorm", "Gamma", "gaussian",
+             "get_all_vars", "glm", "hatvalues", "is.empty.model",
+             "loess.smooth", "logLik", "make.link", "model.frame",
+             "model.matrix", "model.offset", "model.response",
+             "model.weights", "pchisq", "printCoefmat", "pt", "qqline",
+             "qqnorm", "residuals", "rgamma", "sd", "terms", "var")
+importFrom("utils", "packageDescription")
+
+import("Matrix", "MASS", "hglm.data")
 export("hglm", "hglm2", "Beta", "CAR", "SAR", "lrt", "inverse.gamma", "inverse.sqrt")
 
 S3method(hglm, default)

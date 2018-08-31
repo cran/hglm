@@ -201,11 +201,11 @@ if (!is.null(z)) {
     	colnames(z) <- NULL
     } else z.names <- paste("Z.", 1:ncol(z), sep = "")
     Augy <- c(y, psi)      
-    AugXZ <- cBind(x,z)
+    AugXZ <- cbind(x,z)
     XX1 <- Matrix(0, nrow = nRand[k], ncol = ncol(x))
     ZZ2 <- Diagonal(nRand[k])
-    ZZ2 <- cBind(XX1, ZZ2)
-    AugXZ <- rBind(AugXZ, ZZ2)
+    ZZ2 <- cbind(XX1, ZZ2)
+    AugXZ <- rbind(AugXZ, ZZ2)
     rm(list = c("XX1", "ZZ2"))
     colnames(AugXZ) <- c(x.names, z.names)
 } else {
@@ -489,7 +489,7 @@ while (iter <= maxit) {
 	} else {
 		w <- sqrt(as.numeric((dmu_deta^2/family$variance(mu.i))*(1/tau))*prior.weights)
 	}
-	if (method == 'EQL1' & class(rand.family) == 'family' & iter >= 2*(is.null(fix.disp))) if (rand.family$family %in% c('gaussian', 'CAR', 'SAR')) HL.correction <- HL11(fv = fv, w = w, Z = Z, family = family, tau = tau)
+	if (method == 'EQL1' & class(rand.family) == 'family' & iter > 2*(is.null(fix.disp))) if (rand.family$family %in% c('gaussian', 'CAR', 'SAR')) HL.correction <- HL11(fv = fv, w = w, Z = Z, family = family, tau = tau)
 	eta0 <- eta.i
     iter <- iter + 1
 }

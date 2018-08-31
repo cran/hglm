@@ -3,14 +3,14 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Inverse Gamma Family}
 \description{
-  A function used in the \code{hglm} package which creates the inverse gamma family.
+  A function used in the \code{hglm} package for the inverse Gamma family.
 }
 \usage{
-inverse.gamma(link = "inverse")
+inverse.gamma(link="inverse")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{link}{the link function}
+  \item{link}{Link function.}
 }
 
 \value{
