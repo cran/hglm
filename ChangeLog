@@ -1,4 +1,12 @@
-2015-08-24 11:16 xia
+2019-04-04 23:31 xia
+
+    * Update to version 2.2-1
+    * hglm was archived on CRAN due to dependency
+      hglm.data being archived, the latter was 
+      fixed by updating maintainer email address
+      and sp package dependency
+
+2018-08-24 11:16 xia
 
     * Update to version 2.2-0
     * All rBind/cBind replaced by rbind/cbind due to
