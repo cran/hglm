@@ -180,7 +180,7 @@ if (!is.null(startval)) {
     	init.sig.e <- as.numeric(fix.disp)
     }
     if (min(init.sig.u) < 1e-4) {
-    	init.sig.u < rep(.1, k)
+    	init.sig.u <- rep(.1, k)
     	message("0.1 is chosen as the initial values for the dispersion parameter of the random effects.")
     }
     if (init.sig.e < 1e-4) {
